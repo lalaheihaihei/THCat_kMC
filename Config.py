@@ -25,10 +25,15 @@ class Parameters(object):
         self.HomeDir = os.getcwd()
         config = configparser.ConfigParser()
         config.read(FileName)
-        print(config.sections())
+
 
         # Set some common parameters for kMC.
         secCommon = config['common']
+
+        self.Title = secCommon['Title']
+        print('THCat_kMC Start! For system: %s ' % (self.Title))
+        print('\'Config.txt\' include %d parts: ' % (len(config.sections())), config.sections(), '\n')
+
         self.RunType = secCommon['RunType']
         print('Reading configuration file for %s calculation' % (self.RunType))
 
@@ -38,11 +43,16 @@ class Parameters(object):
         self.gas = secCommon['Gas'].split(' ')
         print('The gas molecules involved in the system including:', self.gas)
 
-        self.GasPressure = tuple(map(lambda x : float(x),secCommon['GasPressure'].split(',')))
+        self.GasPressure = tuple(map(lambda x : float(x), secCommon['GasPressure'].split(',')))
 
-        self.latticeSize = tuple(map(lambda x : int(x),secCommon['latticeSize'].split(',')))
+        self.latticeSize = tuple(map(lambda x : int(x), secCommon['latticeSize'].split(',')))
 
-        # Set some common parameters for kMC.
+        self.LoopNum = int(secCommon['LoopNum'].strip())
+        print('Loop number of kMC: %d' % (self.LoopNum))
+
+
+
+        # Set some SA_kMC parameters for kMC.
         secSAspecies = config['SAspecies']
         self.kinds = tuple(map(lambda x : x.strip(), secSAspecies['kinds'].split(',')))
         print(self.kinds)
@@ -62,3 +72,6 @@ class Parameters(object):
         for i in range(len(self.reactions)):
             self.reactions[i] = list(map(lambda x: x.strip().split('+'), self.reactions[i]))
         print(self.reactions)
+
+        self.reactionsKind = tuple(map(lambda x : str(x.strip()), secSAspecies['reactionsKind'].split(',')))
+        print(self.reactionsKind)

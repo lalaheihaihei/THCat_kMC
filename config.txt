@@ -1,10 +1,12 @@
 [common]
+Title = CeO2_stepD_Au
 # 'SA' for single atom catalysis with isolated reaction site. 'SURFACE' for lattice kMC.
 RunType = SA
 Temperature = 300
 Gas = CO O2 CO2
-GasPressure = 1e-3, 1e-1, 1e-3
+GasPressure = 1e-4, 1e-2, 1e-4
 latticeSize = 100, 1
+LoopNum = 10000
 
 [SAspecies]
 kinds = *OAu + *O,
@@ -36,6 +38,7 @@ reactions = 0 + CO <--> 1,
             5 + CO <--> 6,
             6 <--> 7 <--> 8,
             8 <--> 9 + CO2
+reactionsKind = ads, react, des, ads, ads, react, des
 
 
 
