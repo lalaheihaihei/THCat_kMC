@@ -40,8 +40,16 @@ class Parameters(object):
 
         self.GasPressure = secCommon['GasPressure'].split(' ')
 
+        # Set some common parameters for kMC.
+        secSAspecies = config['SAspecies']
+        self.kinds = tuple(map(lambda x : x.strip(), secSAspecies['kinds'].split(',')))
+        print(self.kinds)
 
+        self.ifKindsTS = tuple(map(lambda x : int(x), secSAspecies['ifKindsTS'].split(',')))
+        print(self.ifKindsTS)
 
-
-
+        self.kindsFreq = list(map(lambda x : x.strip().split(' '), secSAspecies['kindsFreq'].split(',')))
+        for i in range(len(self.kindsFreq)):
+            self.kindsFreq[i] = list(map(lambda x : float(x), self.kindsFreq[i]))
+        print(self.kindsFreq)
 

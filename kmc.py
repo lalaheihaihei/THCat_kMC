@@ -51,13 +51,14 @@ path1 = reactions.reactions(IS, TS, FS, T)
 print(path1.forwardK,path1.reverseK)
 '''
 
+'''
 # parameters
 T = 300 # temperature K
 P_CO = 1e-4 # paritial pressure of CO
 P_O2 = 1e-2
 P_CO2 = 1e-4
 latticeSize = (100,1)
-'''
+
 # find all the reaction pathway
 s1 = species.species('*OAu    + *O',(123,2000),0.00)
 s2 = species.species('*OAu-CO + *O',(123,2000),-1.308)
