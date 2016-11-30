@@ -4,8 +4,9 @@
 @author: Jin-Cheng Liu
 @file: kmc.py
 @time: 11/29/2016 11:15 AM
+main program to run kMC
 """
-import species, lattice, reactions, adsorption, re, math, random
+import species, lattice, reactions, adsorption, re, math, random, yaml, configparser, Config
 import scipy.constants as sc
 
 '''
@@ -52,9 +53,11 @@ print(path1.forwardK,path1.reverseK)
 
 # parameters
 T = 300 # temperature K
-P_CO = 1e-3 # paritial pressure of CO
-P_O2 = 1e-3
-
+P_CO = 1e-4 # paritial pressure of CO
+P_O2 = 1e-2
+P_CO2 = 1e-4
+latticeSize = (100,1)
+'''
 # find all the reaction pathway
 s1 = species.species('*OAu    + *O',(123,2000),0.00)
 s2 = species.species('*OAu-CO + *O',(123,2000),-1.308)
@@ -78,7 +81,7 @@ print("For step one:\tk(ads) = %.3e,\tk(des) = %.3e,\tDeltaG = %.3f\n" \
 path2_3 = reactions.reactions(s2, ts2_3, s3, T)
 print("For step two:\tk(forwards) = %.3e,\tk(reverse) = %.3e,\n"%(path2_3.forwardK,path2_3.reverseK))
 
-path3_4 = adsorption.adsorption(s4, s3, T, P_O2, 'CO2')
+path3_4 = adsorption.adsorption(s4, s3, T, P_CO2, 'CO2')
 print("For step three:\tk(des) = %.3e,\tk(ads) = %.3e,\tDeltaG = %.3f\n" \
       % (path3_4.desorbK(), path3_4.adsorbK(), - path3_4.deltaG()))
 
@@ -93,7 +96,7 @@ print("For step five:\tk(ads) = %.3e,\tk(des) = %.3e,\tDeltaG = %.3f\n" \
 path6_7 = reactions.reactions(s6, ts6_7, s7, T)
 print("For step six:\tk(forwards) = %.3e,\tk(reverse) = %.3e,\n"%(path6_7.forwardK,path6_7.reverseK))
 
-path7_8 = adsorption.adsorption(s8, s7, T, P_O2, 'CO2')
+path7_8 = adsorption.adsorption(s8, s7, T, P_CO2, 'CO2')
 print("For step seven:\tk(des) = %.3e,\tk(ads) = %.3e,\tDeltaG = %.3f\n" \
       % (path7_8.desorbK(), path7_8.adsorbK(), - path7_8.deltaG()))
 
@@ -103,7 +106,7 @@ k_forward = (path1_2.adsorbK(), path2_3.forwardK, path3_4.desorbK(), path4_5.ads
 k_reverse = (path1_2.desorbK(), path2_3.reverseK, path3_4.adsorbK(), path4_5.desorbK(),\
     path5_6.desorbK(), path6_7.reverseK, path7_8.adsorbK())
 # DO lattice KMC
-CeO2_stepD = lattice.lattice((10,1))
+CeO2_stepD = lattice.lattice(latticeSize)
 
 print(CeO2_stepD.demension)
 
@@ -114,7 +117,7 @@ print(CeO2_stepD.initialElements)
 CeO2_stepD.initializeElements()
 
 
-for i in range(1000):                              # MC cycle number
+for i in range(10000):                              # MC cycle number
     k_rate = k_rate1 = 0                          # initialize k
     theReactionSite = []
     for j in range(CeO2_stepD.demension[0]):       # x direction
@@ -163,3 +166,14 @@ for i in range(1000):                              # MC cycle number
     FS = speciesTuple[FS_order].kind
     CeO2_stepD.elements = ((theReactionSite[0], theReactionSite[1]), IS, FS)
 print(CeO2_stepD.elements)
+print(CeO2_stepD.elements[0].count(s1.kind))
+print(CeO2_stepD.elements[0].count(s2.kind))
+print(CeO2_stepD.elements[0].count(s3.kind))
+print(CeO2_stepD.elements[0].count(s4.kind))
+print(CeO2_stepD.elements[0].count(s5.kind))
+print(CeO2_stepD.elements[0].count(s6.kind))
+print(CeO2_stepD.elements[0].count(s7.kind))
+'''
+
+a = Config.Parameters()
+print(a.GasPressure)
