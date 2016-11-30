@@ -32,24 +32,33 @@ class Parameters(object):
         self.RunType = secCommon['RunType']
         print('Reading configuration file for %s calculation' % (self.RunType))
 
-        self.Temperature = secCommon['Temperature']
+        self.Temperature = float(secCommon['Temperature'])
         print('kMC will be performed at %s K' % (self.Temperature))
 
         self.gas = secCommon['Gas'].split(' ')
         print('The gas molecules involved in the system including:', self.gas)
 
-        self.GasPressure = secCommon['GasPressure'].split(' ')
+        self.GasPressure = tuple(map(lambda x : float(x),secCommon['GasPressure'].split(',')))
+
+        self.latticeSize = tuple(map(lambda x : int(x),secCommon['latticeSize'].split(',')))
 
         # Set some common parameters for kMC.
         secSAspecies = config['SAspecies']
         self.kinds = tuple(map(lambda x : x.strip(), secSAspecies['kinds'].split(',')))
         print(self.kinds)
 
-        self.ifKindsTS = tuple(map(lambda x : int(x), secSAspecies['ifKindsTS'].split(',')))
-        print(self.ifKindsTS)
+        self.isKindsTS = tuple(map(lambda x : int(x), secSAspecies['isKindsTS'].split(',')))
+        print(self.isKindsTS)
 
-        self.kindsFreq = list(map(lambda x : x.strip().split(' '), secSAspecies['kindsFreq'].split(',')))
+        self.kindsEnergy = tuple(map(lambda x : float(x), secSAspecies['kindsEnergy'].split(',')))
+        print(self.kindsEnergy)
+
+        self.kindsFreq = list(map(lambda x: x.strip().split(' '), secSAspecies['kindsFreq'].split(',')))
         for i in range(len(self.kindsFreq)):
-            self.kindsFreq[i] = list(map(lambda x : float(x), self.kindsFreq[i]))
+            self.kindsFreq[i] = list(map(lambda x: float(x), self.kindsFreq[i]))
         print(self.kindsFreq)
 
+        self.reactions = list(map(lambda x: x.strip().split('<-->'), secSAspecies['reactions'].split(',')))
+        for i in range(len(self.reactions)):
+            self.reactions[i] = list(map(lambda x: x.strip().split('+'), self.reactions[i]))
+        print(self.reactions)

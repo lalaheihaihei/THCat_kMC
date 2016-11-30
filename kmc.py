@@ -176,5 +176,87 @@ print(CeO2_stepD.elements[0].count(s6.kind))
 print(CeO2_stepD.elements[0].count(s7.kind))
 '''
 
-a = Config.Parameters()
-print(a.GasPressure)
+kmc = Config.Parameters()
+
+# Basic parameters.
+T = kmc.Temperature                                               # get temperature /K
+P = {kmc.gas[i]:kmc.GasPressure[i] for i in range(len(kmc.gas))}  # get pressure    /Bar
+latticeSize = kmc.latticeSize
+
+
+
+# Input all species information.
+localMinimum = kmc.isKindsTS.count(0)
+speciesList = []
+TSList = []
+totList = []
+if localMinimum != len(kmc.kinds) - kmc.isKindsTS.count(1):
+    raise ValueError('Error, please checks the kinds and isKindsTS parameters.')
+# Add set species class with kind, frequency, and energy information and append them to speciesList.
+for i in range(len(kmc.kinds)):
+    if kmc.isKindsTS[i] == 0:
+        speciesList.append(species.species(kmc.kinds[i], kmc.kindsFreq[i], kmc.kindsEnergy[i]))
+        totList.append(speciesList[-1])
+    elif kmc.isKindsTS[i] == 1:
+        TSList.append(species.species(kmc.kinds[i], kmc.kindsFreq[i],kmc.kindsEnergy[i]))
+        totList.append(TSList[-1])
+    else:
+        raise ValueError('Error: Error, please checks the isKindsTS parameters.')
+# Transfer local minimum list and ts list to tuple format.
+speciesTuple = tuple(speciesList)
+speciesTuple_kind = tuple(i.kind for i in speciesTuple)
+TSTuple = tuple(TSList)
+totList = tuple(totList)
+print(speciesTuple, speciesTuple_kind, TSTuple)         #speciesTuple[8] = speciesTuple[1]
+# Abbreviate speciesTuple to s, and TSTuple to ts.
+s = totList
+
+
+print(kmc.reactions)
+# find out all the pathways and rate constant.
+
+reactionList = []
+#k_forward = (path1_2.adsorbK(), path2_3.forwardK, path3_4.desorbK(), path4_5.adsorbK(),\
+#    path5_6.adsorbK(), path6_7.forwardK, path7_8.desorbK())
+#k_reverse = (path1_2.desorbK(), path2_3.reverseK, path3_4.adsorbK(), path4_5.desorbK(),\
+#    path5_6.desorbK(), path6_7.reverseK, path7_8.adsorbK())
+
+for i in kmc.reactions:
+    if len(i) == 2:
+        reactionList.append(adsorption.adsorption\
+            (s[int(i[0][0])], s[int(i[1][0])], T, P[kmc.reactions[0][0][1].strip()], kmc.reactions[0][0][1].strip()))
+        print("For step one:\tk(ads) = %.3e,\tk(des) = %.3e,\tDeltaG = %.3f\n" \
+              % (reactionList[-1].adsorbK(), reactionList[-1].desorbK(), reactionList[-1].deltaG()))
+    elif len(i) == 3:
+        reactionList.append(reactions.reactions\
+                (s[int(i[0][0])], s[int(i[1][0])], s[int(i[2][0])], T))
+        print("For step two:\tk(forwards) = %.3e,\tk(reverse) = %.3e,\n"\
+              % (reactionList[-1].forwardK, reactionList[-1].reverseK))
+    else:
+        raise ValueError('Error: please check the reactions parameters.')
+    print(reactionList)
+
+
+'''
+path2_3 = reactions.reactions(s2, ts2_3, s3, T)
+print("For step two:\tk(forwards) = %.3e,\tk(reverse) = %.3e,\n"%(path2_3.forwardK,path2_3.reverseK))
+
+path3_4 = adsorption.adsorption(s4, s3, T, P_CO2, 'CO2')
+print("For step three:\tk(des) = %.3e,\tk(ads) = %.3e,\tDeltaG = %.3f\n" \
+      % (path3_4.desorbK(), path3_4.adsorbK(), - path3_4.deltaG()))
+
+path4_5 = adsorption.adsorption(s4, s5, T, P_O2, 'O2')
+print("For step four:\tk(ads) = %.3e,\tk(des) = %.3e,\tDeltaG = %.3f\n" \
+      % (path4_5.adsorbK(), path4_5.desorbK(), path4_5.deltaG()))
+
+path5_6 = adsorption.adsorption(s5, s6, T, P_O2, 'CO')
+print("For step five:\tk(ads) = %.3e,\tk(des) = %.3e,\tDeltaG = %.3f\n" \
+      % (path5_6.adsorbK(), path5_6.desorbK(), path5_6.deltaG()))
+
+path6_7 = reactions.reactions(s6, ts6_7, s7, T)
+print("For step six:\tk(forwards) = %.3e,\tk(reverse) = %.3e,\n"%(path6_7.forwardK,path6_7.reverseK))
+
+path7_8 = adsorption.adsorption(s8, s7, T, P_CO2, 'CO2')
+print("For step seven:\tk(des) = %.3e,\tk(ads) = %.3e,\tDeltaG = %.3f\n" \
+      % (path7_8.desorbK(), path7_8.adsorbK(), - path7_8.deltaG()))
+'''
