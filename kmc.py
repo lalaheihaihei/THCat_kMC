@@ -80,7 +80,7 @@ for i in range(len(kmc.reactions)):
             (s[int(kmc.reactions[i][1][0])], s[int(kmc.reactions[i][0][0])], T,\
              P[kmc.reactions[i][1][1].strip()], kmc.reactions[i][1][1].strip()))
         print("For step %d:\tk(des) = %.3e,\tk(ads) = %.3e,\tDeltaG = %.3f" % \
-              (i+1, reactionList[-1].desorbK(), reactionList[-1].adsorbK(), reactionList[-1].deltaG()))
+              (i+1, reactionList[-1].desorbK(), reactionList[-1].adsorbK(), - reactionList[-1].deltaG()))
         f = reactionList[-1].desorbK()
         r = reactionList[-1].adsorbK()
         k_forward.append(f)
@@ -177,10 +177,13 @@ for i in range(kmc.LoopNum):                       # MC cycle number
     d_t = (1/k_rate) * math.log(1/t_random)
     time.append(time[-1] + d_t)
 
+
+coverageList =  list(map( lambda i : lat.elements[0].count(speciesTuple_kind[i]) / \
+            lat.demension[0] * lat.demension[1], [ i for i in range(len(speciesTuple_kind))]))
+
 #print(lat.elements)
 for i in range(len(speciesTuple_kind)):
-    print('the coverage for species {:d} = {:.3f}'.\
-          format(i, float(lat.elements[0].count(speciesTuple_kind[i])) / \
-            int(lat.demension[0]) * int(lat.demension[1])))
+    print('the coverage for species {:d} = {:.3f}'. format(i, coverageList[i]))
 print('kMC simulation time is %.2f' % time[-1], 'product number is %d ' % productNum)
-
+print('TOF calculated by product/(time * sites) by ln(r/s-1) = %.2f ' % math.log(productNum / (time[-1] * lat.demension[0]) * int(lat.demension[1])))
+print('TOF calculated by Theta * k_forward by ln(r/s-1) = %.2f ' % math.log(max(coverageList) * k_forward[coverageList.index(max(coverageList))] ) )

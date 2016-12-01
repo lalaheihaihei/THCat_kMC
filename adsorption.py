@@ -63,7 +63,7 @@ class adsorption(object):
 
 
     def gas_mu(self):
-        filename = 'JANAF_%s.txt' % (self._gasKind)
+        filename = './Thermo/JANAF_%s.txt' % (self._gasKind)
         s0 = h0 = h = s = mu_eV_P = 0
         with open(filename, 'r') as f:
             for line in f.readlines():

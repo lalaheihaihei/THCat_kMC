@@ -8,7 +8,7 @@ Read configuration of the species, reactions, lattice and so on
 from a config file. This function is a little stupid, but it works.
 """
 
-import configparser, os
+import configparser, os, time
 
 class Parameters(object):
     """
@@ -21,10 +21,13 @@ class Parameters(object):
         """
         Default value for parameters
         """
-        # Set some necessary directories.
+        # Set necessary directories and job time.
         self.HomeDir = os.getcwd()
         config = configparser.ConfigParser()
         config.read(FileName)
+        starttime = time.clock()
+        print('Starting calculation at')
+        print(time.strftime("%H:%M:%S on %a %d %b %Y"))
 
 
         # Set some common parameters for kMC.
@@ -54,25 +57,32 @@ class Parameters(object):
 
         # Set some SA_kMC parameters for kMC.
         if self.RunType == 'SA':
-            secSAspecies = config['SAspecies']
-        self.kinds = tuple(map(lambda x : x.strip(), secSAspecies['kinds'].split(',')))
-        print(self.kinds)
+            sacSA = config['SA']
+            self.kinds = tuple(map(lambda x : x.strip(), sacSA['kinds'].split(',')))
+            print(self.kinds)
 
-        self.isKindsTS = tuple(map(lambda x : int(x), secSAspecies['isKindsTS'].split(',')))
-        print(self.isKindsTS)
+            self.isKindsTS = tuple(map(lambda x : int(x), sacSA['isKindsTS'].split(',')))
+            print(self.isKindsTS)
 
-        self.kindsEnergy = tuple(map(lambda x : float(x), secSAspecies['kindsEnergy'].split(',')))
-        print(self.kindsEnergy)
+            self.kindsEnergy = tuple(map(lambda x : float(x), sacSA['kindsEnergy'].split(',')))
+            print(self.kindsEnergy)
 
-        self.kindsFreq = list(map(lambda x: x.strip().split(' '), secSAspecies['kindsFreq'].split(',')))
-        for i in range(len(self.kindsFreq)):
-            self.kindsFreq[i] = list(map(lambda x: float(x), self.kindsFreq[i]))
-        print(self.kindsFreq)
+            self.kindsFreq = list(map(lambda x: x.strip().split(' '), sacSA['kindsFreq'].split(',')))
+            for i in range(len(self.kindsFreq)):
+                self.kindsFreq[i] = list(map(lambda x: float(x), self.kindsFreq[i]))
+            print(self.kindsFreq)
 
-        self.reactions = list(map(lambda x: x.strip().split('<-->'), secSAspecies['reactions'].split(',')))
-        for i in range(len(self.reactions)):
-            self.reactions[i] = list(map(lambda x: x.strip().split('+'), self.reactions[i]))
-        print(self.reactions)
+            self.reactions = list(map(lambda x: x.strip().split('<-->'), sacSA['reactions'].split(',')))
+            for i in range(len(self.reactions)):
+                self.reactions[i] = list(map(lambda x: x.strip().split('+'), self.reactions[i]))
+            print(self.reactions)
 
-        self.reactionsKind = tuple(map(lambda x : str(x.strip()), secSAspecies['reactionsKind'].split(',')))
-        print(self.reactionsKind)
+            self.reactionsKind = tuple(map(lambda x : str(x.strip()), sacSA['reactionsKind'].split(',')))
+            print(self.reactionsKind)
+
+
+'''
+        # Set some Surface_kMC parameters for kMC.
+        if self.RunType == 'SURFACE':
+            sacSurface = config['SF']
+'''

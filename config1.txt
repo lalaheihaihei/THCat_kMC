@@ -6,7 +6,7 @@ Temperature = 300
 Gas = CO O2 CO2
 GasPressure = 1e-4, 1e-2, 1e-4
 latticeSize = 100, 1
-LoopNum = 100000
+LoopNum = 10000
 
 [SA]
 kinds = *OAu + *O,
@@ -20,7 +20,7 @@ kinds = *OAu + *O,
         *OAu-CO-OO*,
         *OAu + *O
 isKindsTS = 0,0,1,0,0,0,0,1,0,0
-kindsEnergy = 0.00, -1.308, -0.479, -1.240, -1.140, -2.709, -4.155, -3.391, -5.412, -6.544
+kindsEnergy = 0.00, -1.28, -0.81, -2.14, -0.87, -3.06, -4.04, -3.82, -4.69, -6.52
 kindsFreq = 0,
             2080.84 469.36 444.68 428.53 411.27 383.01 279.30 76.18 55.69,
             1985.91 500.78 438.84 381.84 320.04 265.60 114.40 58.90,
@@ -42,4 +42,7 @@ reactionsKind = ads, react, des, ads, ads, react, des
 
 
 [SF]
+
+
+
 
