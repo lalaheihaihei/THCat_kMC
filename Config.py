@@ -23,8 +23,9 @@ class Parameters(object):
         """
         # Set necessary directories and job time.
         self.HomeDir = os.getcwd()
+        Configfilepath = ('/'.join([self.HomeDir,FileName]))
         config = configparser.ConfigParser()
-        config.read(FileName)
+        config.read(Configfilepath)
         starttime = time.clock()
         print('Starting calculation at')
         print(time.strftime("%H:%M:%S on %a %d %b %Y"))
@@ -81,8 +82,6 @@ class Parameters(object):
             print(self.reactionsKind)
 
 
-'''
         # Set some Surface_kMC parameters for kMC.
         if self.RunType == 'SURFACE':
             sacSurface = config['SF']
-'''
