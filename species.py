@@ -56,7 +56,7 @@ class species(object):
     # get the ZPE energy.
     @property
     def ZPE(self):
-        return sum(list(map(lambda x: x * 1.23981e-4,self._freq)))
+        return sum(list(map(lambda x: 1/2 * x * 1.23981e-4,self._freq)))
 
     @property
     def correctEnergy(self):

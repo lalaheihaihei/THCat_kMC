@@ -53,7 +53,8 @@ class Parameters(object):
 
 
         # Set some SA_kMC parameters for kMC.
-        secSAspecies = config['SAspecies']
+        if self.RunType == 'SA':
+            secSAspecies = config['SAspecies']
         self.kinds = tuple(map(lambda x : x.strip(), secSAspecies['kinds'].split(',')))
         print(self.kinds)
 
