@@ -99,8 +99,11 @@ print('lattice elements is initialized to be %s' % (lat.initialElements))
 lat.initializeElements()    # initialize the elements on surface.
 print('lattice is initialized')
 
-time = [0]                                           # initialize time
-productNum = 0                                      # initialize the product number
+time = [0]                                         # initialize time
+productNum = 0                                     # initialize the product number
+coverage_t_List = []
+for i in range(len(speciesTuple_kind)):
+    coverage_t_List.append(0)
 for i in range(kmc.LoopNum):                       # MC cycle number
     k_rate = k_rate1 = 0                           # initialize k
     theReactionSite = []
@@ -177,9 +180,11 @@ for i in range(kmc.LoopNum):                       # MC cycle number
     d_t = (1/k_rate) * math.log(1/t_random)
     time.append(time[-1] + d_t)
 
-
-coverageList =  list(map( lambda i : lat.elements[0].count(speciesTuple_kind[i]) / \
+    #add a time dependent coverage: see Top Catal (2014) 57:159–170 equation (6).
+    coverage_t_List = list(map( lambda i : coverage_t_List[i] + d_t * lat.elements[0].count(speciesTuple_kind[i])/\
             lat.demension[0] * lat.demension[1], [ i for i in range(len(speciesTuple_kind))]))
+
+coverageList = list(map( lambda i : i / time[-1] , coverage_t_List))
 
 #print(lat.elements)
 for i in range(len(speciesTuple_kind)):
@@ -190,8 +195,3 @@ print('TOF calculated by product/(time * sites) by ln(r/s-1) = %.2f ' % math.log
 # this method has some problem, (1-r) should be multiple as discussed in Norskov'book: (7.4)
 print('TOF calculated by Theta * k_forward by ln(r/s-1) = %.2f ' \
       % math.log(max(coverageList) * k_forward[coverageList.index(max(coverageList))] ) )
-
-print('TOF calculated by Theta * k_forward by ln(r/s-1) = %.2f ' % \
-      math.log(max(coverageList) * kmc.GasPressure[1] * k_forward[coverageList.index(max(coverageList))]\
-      - max(coverageList) * kmc.GasPressure[2] * k_reverse[coverageList.index(max(coverageList)) - 1]) )
-
