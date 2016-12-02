@@ -186,4 +186,12 @@ for i in range(len(speciesTuple_kind)):
     print('the coverage for species {:d} = {:.3f}'. format(i, coverageList[i]))
 print('kMC simulation time is %.2f' % time[-1], 'product number is %d ' % productNum)
 print('TOF calculated by product/(time * sites) by ln(r/s-1) = %.2f ' % math.log(productNum / (time[-1] * lat.demension[0]) * int(lat.demension[1])))
-print('TOF calculated by Theta * k_forward by ln(r/s-1) = %.2f ' % math.log(max(coverageList) * k_forward[coverageList.index(max(coverageList))] ) )
+
+# this method has some problem, (1-r) should be multiple as discussed in Norskov'book: (7.4)
+print('TOF calculated by Theta * k_forward by ln(r/s-1) = %.2f ' \
+      % math.log(max(coverageList) * k_forward[coverageList.index(max(coverageList))] ) )
+
+print('TOF calculated by Theta * k_forward by ln(r/s-1) = %.2f ' % \
+      math.log(max(coverageList) * kmc.GasPressure[1] * k_forward[coverageList.index(max(coverageList))]\
+      - max(coverageList) * kmc.GasPressure[2] * k_reverse[coverageList.index(max(coverageList)) - 1]) )
+

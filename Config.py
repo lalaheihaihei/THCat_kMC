@@ -59,6 +59,7 @@ class Parameters(object):
         # Set some SA_kMC parameters for kMC.
         if self.RunType == 'SA':
             sacSA = config['SA']
+
             self.kinds = tuple(map(lambda x : x.strip(), sacSA['kinds'].split(',')))
             print(self.kinds)
 
@@ -84,4 +85,6 @@ class Parameters(object):
 
         # Set some Surface_kMC parameters for kMC.
         if self.RunType == 'SURFACE':
-            sacSurface = config['SF']
+            sacSF = config['SF']
+            self.kinds = tuple(map(lambda x : x.strip(), sacSF['kinds'].split(',')))
+            print(self.kinds)
