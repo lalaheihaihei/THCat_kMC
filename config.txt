@@ -7,8 +7,8 @@ RunType = SA
 Temperature = 500
 Gas = CO O2 CO2
 GasPressure = 1e-4, 2e-1, 1e-4
-latticeSize = 50, 1
-LoopNum = 100000
+latticeSize = 100, 1
+LoopNum = 1000000
 
 [SA]
 kinds = *OAu + *O,
