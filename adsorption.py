@@ -11,7 +11,7 @@ import species, math, re
 import scipy.constants as sc
 import numpy as np
 
-class adsorption(object):
+class Adsorption(object):
 
     def __init__(self, IS, FS, T, P, gasKind = 'CO'):
         self._IS = IS
