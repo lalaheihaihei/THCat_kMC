@@ -7,7 +7,8 @@
 A pathway class, which links an initial state and a final state.
 """
 
-import lattice,reactions
+from SAmodule import lattice
+
 
 class pathway(lattice):
 

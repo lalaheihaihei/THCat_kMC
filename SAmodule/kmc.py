@@ -6,8 +6,14 @@
 @time: 11/29/2016 11:15 AM
 main program to run kMC
 """
-import species, lattice, reactions, adsorption, re, math, random, yaml, configparser, Config
-import scipy.constants as sc
+import math
+import random
+
+from SAmodule import adsorption
+from SAmodule import reactions
+from SAmodule import species
+from IO import Config
+from SAmodule import lattice
 
 kmc = Config.Parameters()
 
@@ -31,7 +37,7 @@ for i in range(len(kmc.kinds)):
         speciesList.append(species.species(kmc.kinds[i], kmc.kindsFreq[i], kmc.kindsEnergy[i]))
         totList.append(speciesList[-1])
     elif kmc.isKindsTS[i] == 1:
-        TSList.append(species.species(kmc.kinds[i], kmc.kindsFreq[i],kmc.kindsEnergy[i]))
+        TSList.append(species.species(kmc.kinds[i], kmc.kindsFreq[i], kmc.kindsEnergy[i]))
         totList.append(TSList[-1])
     else:
         raise ValueError('Error: Error, please checks the isKindsTS parameters.')
@@ -56,13 +62,13 @@ if len(kmc.reactionsKind) != len(kmc.reactions):
 
 for i in range(len(kmc.reactions)):
     if kmc.reactionsKind[i] == 'ads':
-        reactionList.append(adsorption.adsorption\
+        reactionList.append(adsorption.Adsorption\
             (s[int(kmc.reactions[i][0][0])], s[int(kmc.reactions[i][1][0])], T,\
              P[kmc.reactions[i][0][1].strip()], kmc.reactions[i][0][1].strip()))
         print("For step %d:\tk(ads) = %.3e,\tk(des) = %.3e,\tDeltaG = %.3f" % \
-              (i+1, reactionList[-1].adsorbK(), reactionList[-1].desorbK(), reactionList[-1].deltaG()))
-        f = reactionList[-1].adsorbK()
-        r = reactionList[-1].desorbK()
+              (i + 1, reactionList[-1].adsorb_k(), reactionList[-1].desorb_k(), reactionList[-1].delta_g()))
+        f = reactionList[-1].adsorb_k()
+        r = reactionList[-1].desorb_k()
         k_forward.append(f)  # WHY does work by directly append like k_forward.append(reactionList[-1].adsorbK())
         k_reverse.append(r)
     elif kmc.reactionsKind[i] == 'react':
@@ -76,18 +82,18 @@ for i in range(len(kmc.reactions)):
         k_forward.append(f)
         k_reverse.append(r)
     elif kmc.reactionsKind[i] == 'des':
-        reactionList.append(adsorption.adsorption\
+        reactionList.append(adsorption.Adsorption\
             (s[int(kmc.reactions[i][1][0])], s[int(kmc.reactions[i][0][0])], T,\
              P[kmc.reactions[i][1][1].strip()], kmc.reactions[i][1][1].strip()))
         print("For step %d:\tk(des) = %.3e,\tk(ads) = %.3e,\tDeltaG = %.3f" % \
-              (i+1, reactionList[-1].desorbK(), reactionList[-1].adsorbK(), - reactionList[-1].deltaG()))
-        f = reactionList[-1].desorbK()
-        r = reactionList[-1].adsorbK()
+              (i + 1, reactionList[-1].desorb_k(), reactionList[-1].adsorb_k(), - reactionList[-1].delta_g()))
+        f = reactionList[-1].desorb_k()
+        r = reactionList[-1].adsorb_k()
         k_forward.append(f)
         k_reverse.append(r)
     else:
         raise ValueError('Error: please check the reactions parameters.')
-#reactionTuple = tuple(reactionList)
+# reactionTuple = tuple(reactionList)
 print(reactionList)
 print(k_forward, '\n', k_reverse)
 

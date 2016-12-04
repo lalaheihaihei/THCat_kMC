@@ -7,90 +7,87 @@
 a class of the
 """
 
-import species, math, re
+import math
 import scipy.constants as sc
-import numpy as np
+
 
 class Adsorption(object):
 
-    def __init__(self, IS, FS, T, P, gasKind = 'CO'):
-        self._IS = IS
-        self._FS = FS
-        self._T = T
-        self._P = P
-        self._gasKind = gasKind
-
+    def __init__(self, ini_state, fin_state, temperature, pressure, gas_kind='CO'):
+        self._IS = ini_state
+        self._FS = fin_state
+        self._T = temperature
+        self._P = pressure
+        self._gas_kind = gas_kind
 
     @property
-    def IS(self):
+    def ini_state(self):
         return self._IS
 
-    @IS.setter
-    def IS(self,s):
+    @ini_state.setter
+    def ini_state(self, s):
         self._IS = s
 
     @property
-    def FS(self):
+    def fin_state(self):
         return self._FS
 
-    @FS.setter
-    def FS(self,s):
+    @fin_state.setter
+    def fin_state(self, s):
         self._FS = s
 
     @property
-    def T(self):
+    def temperature(self):
         return self._T
 
-    @T.setter
-    def T(self,s):
+    @temperature.setter
+    def temperature(self, s):
         self._T = s
 
     @property
-    def P(self):
+    def pressure(self):
         return self._P
 
-    @P.setter
-    def P(self,s):
+    @pressure.setter
+    def pressure(self, s):
         self._P = s
 
     @property
-    def gasKind(self):
-        return self._gasKind
+    def gas_kind(self):
+        return self._gas_kind
 
-    @gasKind.setter
-    def gasKind(self,s):
-        self._gasKind = s
-
+    @gas_kind.setter
+    def gas_kind(self, s):
+        self._gas_kind = s
 
     def gas_mu(self):
-        filename = './Thermo/JANAF_%s.txt' % (self._gasKind)
-        s0 = h0 = h = s = mu_eV_P = 0
+        filename = '../Thermo/JANAF_%s.txt' % self._gas_kind
+        s0 = h0 = h = s = mu_ev_p = 0
         with open(filename, 'r') as f:
             for line in f.readlines():
                 line = line.split()
-                #print(line)
+                # print(line)
                 if int(line[0]) == 0:
                     s0 = float(line[1])
                     h0 = float(line[2])
                 if int(line[0]) == int(self._T):
                     s = float(line[1]) - s0
                     h = float(line[2]) - h0
-                mu_KjperMol = h - self._T * s / 1000 # KJ/mol
-                mu_eV = mu_KjperMol * 0.010364272    # eV
+                mu_kjpermol = h - self._T * s / 1000  # KJ/mol
+                mu_ev = mu_kjpermol * 0.010364272     # eV
                 k = sc.physical_constants['Boltzmann constant in eV/K'][0]
-                mu_eV_P = mu_eV + k * self._T * math.log(self._P/1.)
-        return mu_eV_P
+                mu_ev_p = mu_ev + k * self._T * math.log(self._P/1.)
+        return mu_ev_p
 
+    def delta_g(self):
+        # T_S_CO = -0.703269353 # at 300 K and 10e-3 bar
+        is_g = self._IS.energy + self.gas_mu()
+        fs_g = self._FS.energy
+        return fs_g - is_g
 
-    def deltaG(self):
-        #T_S_CO = -0.703269353 # at 300 K and 10e-3 bar
-        isG = self._IS.energy + self.gas_mu()
-        fsG = self._FS.energy
-        return fsG - isG
-
-    def adsorbK(self):
+    def adsorb_k(self):
         mass = 0
-        for i in self._gasKind:
+        for i in self._gas_kind:
             if i == 'C':
                 tmp = i
                 mass += 12.01
@@ -107,15 +104,14 @@ class Adsorption(object):
             else:
                 raise ValueError('Error, cannot recongnize the gas molecule.')
         s = 0.5  # sticking coefficient, we assume S = 0.5 for all the species
-        A = (0.3 * 10e-9) ** 2  # the area of the adsorption site
-        m = (mass / 1000) / sc.physical_constants['Avogadro constant'][0] # mass
+        area = (0.3 * 10e-9) ** 2  # the area of the adsorption site
+        m = (mass / 1000) / sc.physical_constants['Avogadro constant'][0]  # mass
         k = sc.physical_constants['Boltzmann constant'][0]  # boltzmann constant
-        return ( s * self._P * A ) / math.sqrt( 2 * math.pi * m * k * self._T)
+        return (s * self._P * area) / math.sqrt(2 * math.pi * m * k * self._T)
 
-    def desorbK(self):
+    def desorb_k(self):
         k = sc.physical_constants['Boltzmann constant in eV/K'][0]
-        K_equilibrium = math.e ** ( - self.deltaG() / ( k * self._T) ) \
+        k_equilibrium = math.e ** (- self.delta_g() / (k * self._T)) \
             # The equilibrium constant K = k(forward)/k(backward)
-        desorbK = self.adsorbK() / K_equilibrium
-        return desorbK
-
+        desorb_k = self.adsorb_k() / k_equilibrium
+        return desorb_k

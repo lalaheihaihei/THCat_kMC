@@ -8,7 +8,10 @@ Read configuration of the species, reactions, lattice and so on
 from a config file. This function is a little stupid, but it works.
 """
 
-import configparser, os, time
+import configparser
+import os
+import time
+
 
 class Parameters(object):
     """
@@ -16,14 +19,13 @@ class Parameters(object):
     Using a class to handle a bunch of parameters might be a good idea.
     """
 
-
-    def __init__(self, FileName = 'config.txt'):
+    def __init__(self, filename='config.txt'):
         """
         Default value for parameters
         """
         # Set necessary directories and job time.
         self.HomeDir = os.getcwd()
-        Configfilepath = ('/'.join([self.HomeDir,FileName]))
+        Configfilepath = ('/'.join([self.HomeDir, filename]))
         config = configparser.ConfigParser()
         config.read(Configfilepath)
         starttime = time.clock()

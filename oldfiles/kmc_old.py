@@ -5,9 +5,13 @@
 @file: kmc_old.py
 @time: 12/1/2016 10:24 AM
 """
-import species, lattice, reactions, adsorption, re, math, random, yaml, configparser, Config
-import scipy.constants as sc
+import random
 
+import adsorption
+import reactions
+import species
+
+from SAmodule import lattice
 
 '''
 TEST CODES:
@@ -62,16 +66,16 @@ P_CO2 = 1e-4
 latticeSize = (100,1)
 
 # find all the reaction pathway
-s1 = species.species('*OAu    + *O',(123,2000),0.00)
-s2 = species.species('*OAu-CO + *O',(123,2000),-1.308)
-ts2_3 = species.species('*OAu-CO...O*',(123,2000),-0.479)
-s3 = species.species('*OAu-COO*',(123,2000),-1.240)
-s4 = species.species('*OAu    + *',(123,2000),-1.140)
-s5 = species.species('*OAu    + *O2',(123,2000),-2.709)
-s6 = species.species('*OAuCO  + *O2',(123,2000),-4.155)
-ts6_7 = species.species('*OAuCO...O2*',(123,2000),-3.391)
-s7 = species.species('*OAu-CO-OO*',(123,2000),-5.412)
-s8 = species.species('*OAu    + *O',(123,2000),-6.544)
+s1 = species.species('*OAu    + *O', (123, 2000), 0.00)
+s2 = species.species('*OAu-CO + *O', (123, 2000), -1.308)
+ts2_3 = species.species('*OAu-CO...O*', (123, 2000), -0.479)
+s3 = species.species('*OAu-COO*', (123, 2000), -1.240)
+s4 = species.species('*OAu    + *', (123, 2000), -1.140)
+s5 = species.species('*OAu    + *O2', (123, 2000), -2.709)
+s6 = species.species('*OAuCO  + *O2', (123, 2000), -4.155)
+ts6_7 = species.species('*OAuCO...O2*', (123, 2000), -3.391)
+s7 = species.species('*OAu-CO-OO*', (123, 2000), -5.412)
+s8 = species.species('*OAu    + *O', (123, 2000), -6.544)
 #s8 = s1
 speciesTuple = (s1,s2,s3,s4,s5,s6,s7,s8)
 speciesTuple_kind = tuple(i.kind for i in speciesTuple)
@@ -79,35 +83,35 @@ speciesTuple_kind = tuple(i.kind for i in speciesTuple)
 # find out rate constant
 path1_2 = adsorption.adsorption(s1, s2, T, P_CO, 'CO')
 print("For step one:\tk(ads) = %.3e,\tk(des) = %.3e,\tDeltaG = %.3f\n" \
-      % (path1_2.adsorbK(), path1_2.desorbK(), path1_2.deltaG()))
+      % (path1_2.adsorb_k(), path1_2.desorb_k(), path1_2.delta_g()))
 
 path2_3 = reactions.reactions(s2, ts2_3, s3, T)
 print("For step two:\tk(forwards) = %.3e,\tk(reverse) = %.3e,\n"%(path2_3.forwardK,path2_3.reverseK))
 
 path3_4 = adsorption.adsorption(s4, s3, T, P_CO2, 'CO2')
 print("For step three:\tk(des) = %.3e,\tk(ads) = %.3e,\tDeltaG = %.3f\n" \
-      % (path3_4.desorbK(), path3_4.adsorbK(), - path3_4.deltaG()))
+      % (path3_4.desorb_k(), path3_4.adsorb_k(), - path3_4.delta_g()))
 
 path4_5 = adsorption.adsorption(s4, s5, T, P_O2, 'O2')
 print("For step four:\tk(ads) = %.3e,\tk(des) = %.3e,\tDeltaG = %.3f\n" \
-      % (path4_5.adsorbK(), path4_5.desorbK(), path4_5.deltaG()))
+      % (path4_5.adsorb_k(), path4_5.desorb_k(), path4_5.delta_g()))
 
 path5_6 = adsorption.adsorption(s5, s6, T, P_O2, 'CO')
 print("For step five:\tk(ads) = %.3e,\tk(des) = %.3e,\tDeltaG = %.3f\n" \
-      % (path5_6.adsorbK(), path5_6.desorbK(), path5_6.deltaG()))
+      % (path5_6.adsorb_k(), path5_6.desorb_k(), path5_6.delta_g()))
 
 path6_7 = reactions.reactions(s6, ts6_7, s7, T)
 print("For step six:\tk(forwards) = %.3e,\tk(reverse) = %.3e,\n"%(path6_7.forwardK,path6_7.reverseK))
 
 path7_8 = adsorption.adsorption(s8, s7, T, P_CO2, 'CO2')
 print("For step seven:\tk(des) = %.3e,\tk(ads) = %.3e,\tDeltaG = %.3f\n" \
-      % (path7_8.desorbK(), path7_8.adsorbK(), - path7_8.deltaG()))
+      % (path7_8.desorb_k(), path7_8.adsorb_k(), - path7_8.delta_g()))
 
 reactionTuple = (path1_2, path2_3, path3_4, path4_5, path5_6, path6_7, path7_8)
-k_forward = (path1_2.adsorbK(), path2_3.forwardK, path3_4.desorbK(), path4_5.adsorbK(),\
-    path5_6.adsorbK(), path6_7.forwardK, path7_8.desorbK())
-k_reverse = (path1_2.desorbK(), path2_3.reverseK, path3_4.adsorbK(), path4_5.desorbK(),\
-    path5_6.desorbK(), path6_7.reverseK, path7_8.adsorbK())
+k_forward = (path1_2.adsorb_k(), path2_3.forwardK, path3_4.desorb_k(), path4_5.adsorb_k(), \
+             path5_6.adsorb_k(), path6_7.forwardK, path7_8.desorb_k())
+k_reverse = (path1_2.desorb_k(), path2_3.reverseK, path3_4.adsorb_k(), path4_5.desorb_k(), \
+             path5_6.desorb_k(), path6_7.reverseK, path7_8.adsorb_k())
 # DO lattice KMC
 CeO2_stepD = lattice.lattice(latticeSize)
 

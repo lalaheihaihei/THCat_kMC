@@ -6,8 +6,12 @@
 @time: 11/29/2016 2:36 PM
 """
 
-import species, math
+import math
+
 import scipy.constants as sc
+
+from SAmodule import species
+
 
 class reactions(object):
 
