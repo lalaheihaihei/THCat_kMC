@@ -19,11 +19,12 @@ class Parameters(object):
     Using a class to handle a bunch of parameters might be a good idea.
     """
 
-    def __init__(self, filename='config.txt'):
+    def __init__(self, filename='config-step-U.txt'):
         """
         Default value for parameters
         """
         # Set necessary directories and job time.
+        self.__filename = filename
         self.HomeDir = os.getcwd()
         Configfilepath = ('/'.join([self.HomeDir, filename]))
         config = configparser.ConfigParser()
@@ -68,7 +69,7 @@ class Parameters(object):
             self.isKindsTS = tuple(map(lambda x : int(x), sacSA['isKindsTS'].split(',')))
             print(self.isKindsTS)
 
-            self.kindsEnergy = tuple(map(lambda x : float(x), sacSA['kindsEnergy'].split(',')))
+            self.kindsEnergy = tuple(map(lambda x : float(x.strip()), sacSA['kindsEnergy'].split(',')))
             print(self.kindsEnergy)
 
             self.kindsFreq = list(map(lambda x: x.strip().split(' '), sacSA['kindsFreq'].split(',')))

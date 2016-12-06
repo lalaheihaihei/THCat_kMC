@@ -8,3 +8,5 @@
 
 import SAmodule.kmc
 
+SAmodule.kmc.main()
+
