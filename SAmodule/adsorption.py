@@ -86,23 +86,20 @@ class Adsorption(object):
         return fs_g - is_g
 
     def adsorb_k(self):
-        mass = 0
-        for i in self._gas_kind:
-            if i == 'C':
-                tmp = i
-                mass += 12.01
-            elif i == 'O':
-                tmp = i
-                mass += 16.00
-            elif i == '2':
-                if tmp == 'C':
-                    mass += 12.01
-                elif tmp == 'O':
-                    mass += 16.00
-                else:
-                    raise ValueError('Error, cannot recongnize the gas molecule.')
-            else:
-                raise ValueError('Error, cannot recongnize the gas molecule.')
+        if self._gas_kind == 'CO':
+            mass = 28.01
+        elif self._gas_kind == 'CO2':
+            mass = 44.01
+        elif self._gas_kind == 'O2':
+            mass = 32.00
+        elif self._gas_kind == 'H2':
+            mass = 2.02
+        elif self._gas_kind == 'N2':
+            mass = 28.01
+        elif self._gas_kind == 'NH3':
+            mass = 17.03
+        else:
+            raise ValueError('Error, cannot recongnize the gas molecule.')
         s = 0.5  # sticking coefficient, we assume S = 0.5 for all the species
         area = (0.3 * 10e-9) ** 2  # the area of the adsorption site
         m = (mass / 1000) / sc.physical_constants['Avogadro constant'][0]  # mass

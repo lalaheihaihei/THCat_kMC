@@ -59,6 +59,7 @@ def add_list(kmc, speciesList = [], TSList = [], totList = []):
     """
     for i in range(len(kmc.kinds)):
         if kmc.isKindsTS[i] == 0:
+            #print(kmc.kinds, kmc.kindsFreq, kmc.kindsEnergy)
             speciesList.append(species.species(kmc.kinds[i], kmc.kindsFreq[i], kmc.kindsEnergy[i]))
             totList.append(speciesList[-1])
         elif kmc.isKindsTS[i] == 1:
@@ -164,7 +165,7 @@ def add_reaction(kmc, totList, T, P, reactionList = [], k_forward = [], k_revers
                 dict_reaction[int(kmc.reactions[i][1][0])].append(k_reverse[-1])
             else:
                 dict_reaction[int(kmc.reactions[i][1][0])] = [k_reverse[-1]]
-
+            #print(reactionList[-1].gas_mu())
             if int(kmc.reactions[i][0][0]) in dict_reaction_direction.keys():
                 dict_reaction_direction[int(kmc.reactions[i][0][0])].append(int(kmc.reactions[i][1][0]))
             else:
@@ -178,6 +179,7 @@ def add_reaction(kmc, totList, T, P, reactionList = [], k_forward = [], k_revers
         else:
             raise ValueError('Error: please check the reactions parameters.')
     # Add the last step to the first one: Warming, the last reaction counted twice.
+
     dict_reaction[0].append(dict_reaction[len(totList)-1][0])
     dict_reaction_direction[0].append(dict_reaction_direction[len(totList)-1][0])
     return reactionList, k_forward, k_reverse, dict_reaction, dict_reaction_direction
@@ -230,6 +232,22 @@ def do_kmc_loop(kmc, lat, speciesTuple_kind, totList, totList_kind, dict_reactio
                 #print(IS_order, IS_order-1, k_forward[IS_order], k_reverse[IS_order-1])
                 k_rate += sum(dict_reaction[IS_order])  # get K_tot
 
+
+        # bug fixed, coverage information should be recorded firstly. Then, update the reaction directon.
+        # update time
+        t_random = random.random()
+        d_t = (1/k_rate) * math.log(1/t_random)
+        if IS_order == 15:
+            print(k_rate, d_t)
+        time.append(time[-1] + d_t)
+
+        #add a time dependent coverage: see Top Catal (2014) 57:159–170 equation (6).
+        coverage_t_List = list(map( lambda i : coverage_t_List[i] + d_t * lat.elements[0].count(speciesTuple_kind[i])/\
+                lat.demension[0] * lat.demension[1], [ i for i in range(len(speciesTuple_kind))]))
+
+
+
+        # bug fixed, coverage information should be recorded firstly. Then, update the reaction directon.
         k_random = random.random()                 # random a k_random
         # print('k_random and k_rate =', k_random,k_rate)
         for j in range(lat.demension[0]):       # x direction
@@ -274,10 +292,10 @@ def do_kmc_loop(kmc, lat, speciesTuple_kind, totList, totList_kind, dict_reactio
         FS = totList_kind[FS_order]
 
         # count the reaction sites:
-        if totList[FS_order] == totList[0] and totList[IS_order] == totList[8]:
+        if totList[FS_order] == totList[0] and totList[IS_order] == totList[-2]:
             #print('********* +1')
             productNum += 1
-        elif totList[FS_order] == totList[8] and totList[IS_order] == totList[0]:
+        elif totList[FS_order] == totList[-2] and totList[IS_order] == totList[0]:
             #print('********* -1')
             productNum -= 1
         else:
@@ -285,16 +303,9 @@ def do_kmc_loop(kmc, lat, speciesTuple_kind, totList, totList_kind, dict_reactio
 
         lat.elements = ((theReactionSite[0], theReactionSite[1]), IS, FS) # update lattice elements
 
-        # update time
-        t_random = random.random()
-        d_t = (1/k_rate) * math.log(1/t_random)
-        time.append(time[-1] + d_t)
-
-        #add a time dependent coverage: see Top Catal (2014) 57:159–170 equation (6).
-        coverage_t_List = list(map( lambda i : coverage_t_List[i] + d_t * lat.elements[0].count(speciesTuple_kind[i])/\
-                lat.demension[0] * lat.demension[1], [ i for i in range(len(speciesTuple_kind))]))
 
     coverageList = list(map(lambda i: i / time[-1], coverage_t_List))
+
     return time, productNum, coverageList
 
 
@@ -330,6 +341,7 @@ def main():
     # print(lat.elements)
 
     # print coverage information, time, and product number.
+    print(speciesTuple, coverageList)
     for i in range(len(speciesTuple_kind)):
         print('the coverage for species {:s} = {:.3f}'. format(speciesTuple[i].kind, coverageList[i]))
     print('kMC simulation time is %.2f' % time[-1], 'product number is %d ' % productNum)

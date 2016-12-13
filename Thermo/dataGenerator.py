@@ -1,10 +1,5 @@
 # -*- coding:utf-8 -*-
 
-"""
-@author: Jin-Cheng Liu
-@file: dataGenerator.py
-@time: 12/2/2016 11:56 AM
-"""
 import math
 
 #Define default shomate parameters
@@ -239,4 +234,5 @@ def generate(T1=300, T2=1000, per=10, lib='CO_g:298-1300'):
     for i in range(T1, T2, per):
         print(i, ' ', S(i, shomate_params[lib]), ' ', H(i, shomate_params[lib]))
 
-generate(300, 1000, 10, 'CO_g:298-1300')
+
+generate(300, 1400, 10, 'NH3_g:298-1400')

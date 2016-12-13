@@ -4,11 +4,11 @@ Title = CeO2_stepD_Au
 # 'SF' for lattice kMC on surface.
 # 'IF' for lattice kMC on interface.
 RunType = SA
-Temperature = 300
+Temperature = 400
 Gas = CO O2 CO2
 GasPressure = 1e-4, 2e-1, 1e-4
 latticeSize = 50, 1
-LoopNum = 1000000
+LoopNum = 100000
 
 [SA]
 kinds = *OAu + *O,
