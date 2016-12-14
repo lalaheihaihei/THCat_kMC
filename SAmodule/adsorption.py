@@ -66,6 +66,8 @@ class Adsorption(object):
         with open(filename, 'r') as f:
             for line in f.readlines():
                 line = line.split()
+                while '' in line:
+                    line.remove('')
                 # print(line)
                 if int(line[0]) == 0:
                     s0 = float(line[1])
@@ -98,6 +100,12 @@ class Adsorption(object):
             mass = 28.01
         elif self._gas_kind == 'NH3':
             mass = 17.03
+        elif self._gas_kind == 'C2H2':
+            mass = 26.038
+        elif self._gas_kind == 'C2H4':
+            mass = 28.054
+        elif self._gas_kind == 'C2H6':
+            mass = 30.07
         else:
             raise ValueError('Error, cannot recongnize the gas molecule.')
         s = 0.5  # sticking coefficient, we assume S = 0.5 for all the species

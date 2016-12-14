@@ -84,6 +84,17 @@ shomate_params['HCOOH_g:298-1500'] = [3.8027523042252258,
         0.27720649972633382, -6.16527, 212.9698972559699, 0]
 #Fitted to values from Chao et. al. as referenced in NIST.
 #H constrained to 0
+shomate_params['C2H2_g:298-1100'] = [40.68697, 40.73279, -16.17840, 3.669741,
+                                     -0.658411, 210.7067, 235.0052, 226.7314]#NIST
+shomate_params['C2H2_g:1100-6000'] = [67.47244, 11.75110, -2.021470, 0.136195,
+                                      -9.806418, 185.4550, 253.5337, 226.7314]#NIST
+shomate_params['C2H4_g:298-1200'] = [-6.387880, 184.4019, -112.9718, 28.49593,
+                                     0.315540, 48.17332, 163.1568, 52.46694]#NIST
+shomate_params['C2H4_g:1200-6000'] = [106.5104, 13.73260, -2.628481, 0.174595,
+                                      -35.36237, 275.0424, 52.46694, -26.14469,]#NIST
+#shomate_params['C2H6_g:']
+
+
 
 
 #Define default ideal gas parameters
@@ -234,5 +245,4 @@ def generate(T1=300, T2=1000, per=10, lib='CO_g:298-1300'):
     for i in range(T1, T2, per):
         print(i, ' ', S(i, shomate_params[lib]), ' ', H(i, shomate_params[lib]))
 
-
-generate(300, 1400, 10, 'NH3_g:298-1400')
+generate(300, 1210, 10, 'C2H2_g:298-1100')

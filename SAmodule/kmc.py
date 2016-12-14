@@ -37,6 +37,7 @@ def test_reaction_number(kmc):
     :return: None
     """
     if len(kmc.reactionsKind) != len(kmc.reactions):
+        print(kmc.reactionsKind, kmc.reactions)
         raise ValueError('Error: Please check the reactions number and reactionsKind number')
     return None
 
@@ -237,8 +238,6 @@ def do_kmc_loop(kmc, lat, speciesTuple_kind, totList, totList_kind, dict_reactio
         # update time
         t_random = random.random()
         d_t = (1/k_rate) * math.log(1/t_random)
-        if IS_order == 15:
-            print(k_rate, d_t)
         time.append(time[-1] + d_t)
 
         #add a time dependent coverage: see Top Catal (2014) 57:159–170 equation (6).

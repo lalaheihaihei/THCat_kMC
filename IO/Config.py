@@ -19,7 +19,7 @@ class Parameters(object):
     Using a class to handle a bunch of parameters might be a good idea.
     """
 
-    def __init__(self, filename='config-Au13.txt'):
+    def __init__(self, filename='config-N2.txt'):
         """
         Default value for parameters
         """
