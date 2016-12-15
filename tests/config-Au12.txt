@@ -1,0 +1,48 @@
+[common]
+Title = CeO2_stepD_Au
+# 'SA' for single atom catalysis with isolated reaction site.
+# 'SF' for lattice kMC on surface.
+# 'IF' for lattice kMC on interface.
+RunType = SA
+Temperature = 600
+Gas = CO O2 CO2
+GasPressure = 1e-4, 2e-1, 1e-4
+latticeSize = 10, 1
+LoopNum = 5000000
+
+[SA]
+kinds = *OAu + *O,
+        *OAu-CO + *O,
+        *OAu-CO...O*,
+        *OAu-COO*,
+        *OAu + *,
+        *OAu + *O2,
+        *OAuCO + *O2,
+        *OAuCO...O2*,
+        *OAu-CO-OO*,
+        *OAu + *O
+isKindsTS = 0,0,1,0,0,0,0,1,0,0
+kindsEnergy = 0.00, -1.301, -0.705, -1.837, -0.304, -3.313, -4.439, -4.233, -7.058, -6.544
+kindsFreq = 0,
+            2066.34 377.60 371.31 348.64 297.14 264.86 258.98 51.84 25.63,
+            1941.97 483.19 340.80 333.76 304.70 276.96 183.47 31.39,
+            1563.55 1038.53 759.10 524.57 320.10 279.31 225.50 150.47 95.36,
+            0,
+            0,
+            1724.21 852.52 693.88 466.27 458.17 335.47 235.62 124.84 38.79,
+            1626.81 912.75 624.23 474.03 342.41 262.44 104.15 40.61,
+            2361.32 1319.22 618.45 607.48 51.66 48.95 46.87 26.18 38.13,
+            0
+reactions = 0 + CO <--> 1,
+            1 <--> 2 <--> 3,
+            3 <--> 4 + CO2,
+            4 + O2 <--> 5,
+            5 + CO <--> 6,
+            6 <--> 7 <--> 8,
+            8 <--> 9 + CO2
+reactionsKind = ads, react, des, ads, ads, react, des
+
+
+[SF]
+kinds = *OAu + *O,
+        *OAu-CO + *O

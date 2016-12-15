@@ -1,0 +1,45 @@
+[common]
+Title = CeO2_stepD_Au
+# 'SA' for single atom catalysis with isolated reaction site.
+# 'SF' for lattice kMC on surface.
+# 'IF' for lattice kMC on interface.
+RunType = SA
+Temperature = 500
+Gas = C2H2 H2 C2H4
+GasPressure = 1e-1, 2e-1, 1
+latticeSize = 1, 1
+LoopNum = 3000000
+
+[SA]
+kinds = 0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+isKindsTS = 0,0,0,1,0,0,1,0,0
+kindsEnergy = 0.00, -0.846, -1.137, -0.699, -1.944, -2.412, -1.141, -2.689, -1.891
+kindsFreq = 1,                                                                            
+            1,               
+            1,                     
+            1,             
+            1,                                                                           
+            1,                                                                            
+            1,               
+            1,
+            1
+reactions = 0 + C2H2 <--> 1,
+            1 + H2 <--> 2,
+            2 <--> 3 <--> 4,
+            4 + H2 <--> 5,
+            5 <--> 6 <--> 7,
+            7 <--> 8 + C2H4
+reactionsKind = ads, ads, react, ads, react, des
+
+
+[SF]
+kinds = *OAu + *O,
+        *OAu-CO + *O
