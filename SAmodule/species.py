@@ -7,13 +7,13 @@
 A species class, including TS, which all contain frequency and energy information.
 """
 
+
 class species(object):
 
     def __init__(self, kind = 'CO', freq = (100,1000,2000), energy = 10):
         self._kind = kind
         self._freq = freq
         self._energy = energy
-
 
     # set the adsorbed speices.
     @property
@@ -25,7 +25,6 @@ class species(object):
         if not isinstance(a,str):
             raise ValueError('kind must be string')
         self._kind = a
-
 
     # set the frequency.
     @property
@@ -40,7 +39,6 @@ class species(object):
             if not isinstance(i,float):
                 raise ValueError('freq tuple\' elements must be float')
         self._freq = values
-
 
     # set the energy.
     @property
@@ -60,6 +58,7 @@ class species(object):
 
     @property
     def correctEnergy(self):
-        return self._energy - self.ZPE
+        # print('ZPEZPEZPEZPEZPE', self._energy - self.ZPE) # for bug fix.
+        return self._energy + self.ZPE   # BUG FIXED: before Dec 18th, the ZPE is minus...
 
 

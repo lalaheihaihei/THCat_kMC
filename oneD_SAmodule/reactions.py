@@ -13,42 +13,16 @@ import scipy.constants as sc
 from SAmodule import species
 
 
-class reactions(object):
+class Reactions(object):
 
-    def __init__(self, IS, TS, FS, T):
-        self._IS = IS
-        self._TS = TS
-        self._FS = FS
-        self._T = T
+    def __init__(self, energies, reactions, temperature, freq):
+        self._energies = energies
+        self._reactions = reactions
+        self._T = temperature
+        self._freq = freq
         self.__k = sc.physical_constants['Boltzmann constant in eV/K'][0]
         self.__h = sc.physical_constants['Planck constant in eV s'][0]
         self.__c = sc.physical_constants['speed of light in vacuum'][0]
-
-    @property
-    def IS(self):
-        return self._IS
-
-    @IS.setter
-    def IS(self,s):
-        if not isinstance(self._IS, species):
-            raise ValueError('Error: input in reactions must be species.')
-        self._IS = s
-
-    @property
-    def FS(self):
-        return self._FS
-
-    @FS.setter
-    def FS(self,s):
-        self._FS = s
-
-    @property
-    def TS(self):
-        return self._TS
-
-    @TS.setter
-    def TS(self,s):
-        self._TS = s
 
     @property
     def T(self):
@@ -58,24 +32,32 @@ class reactions(object):
     def T(self,s):
         self._T = s
 
+    def ZPE(self):
+        zpe = []
+        for i in self._freq:
+            zpe.append(sum(list(map(lambda x: 1/2 * x * 1.23981e-4, i))))
+        return zpe
+
+
     @property
     def forwardE(self):
-        return self._TS.correctEnergy - self._IS.correctEnergy
+        zpe = self.ZPE()
+        return (self._energies[1] + zpe[1]) - (self._energies[0] + zpe[0])
 
     @property
     def reverseE(self):
-        return self._TS.correctEnergy - self._FS.correctEnergy
+        zpe = self.ZPE()
+        return (self._energies[1] + zpe[1]) - (self._energies[2] + zpe[2])
 
     @property
     def forwardK(self):
-        return self.kHTST(self.forwardE, self._IS.freq, self._TS.freq)
+        return self.kHTST(self.forwardE, self._freq[0], self._freq[1])
 
     @property
     def reverseK(self):
-        return self.kHTST(self.reverseE, self._FS.freq, self._TS.freq)
+        return self.kHTST(self.reverseE, self._freq[2], self._freq[1])
 
     def kHTST(self, E, freq1, freq2):
-
         productRatio = self.productRatio(freq1, freq2)
         # print("productRatio: ", productRatio, 'E: ', E)
         # See 'Fundamental ConCepts in Heterogeneous Catalysis' equation 4.47
