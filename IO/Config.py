@@ -19,7 +19,7 @@ class Parameters(object):
     Using a class to handle a bunch of parameters might be a good idea.
     """
 
-    def __init__(self, filename='config-Au12.txt'):
+    def __init__(self, filename='config-step-D.txt'):
         """
         Default value for parameters
         """
@@ -87,7 +87,31 @@ class Parameters(object):
 
 
         # Set some Surface_kMC parameters for kMC.
-        if self.RunType == 'SURFACE':
-            sacSF = config['SF']
-            self.kinds = tuple(map(lambda x : x.strip(), sacSF['kinds'].split(',')))
-            print(self.kinds)
+        if self.RunType == '1D_SA':
+            sac1D_SA = config['1D_SA']
+
+            self.num_SA = sac1D_SA['number_SA'].split(' ')
+
+            self.kinds = tuple(map(lambda x : x.strip(), sac1D_SA['kinds'].split(',')))
+            print('surface species contain:', self.kinds)
+            self.TSkinds = tuple(map(lambda x: x.strip(), sac1D_SA['TSkinds'].split(',')))
+            print("surface TS species contain:", self.TSkinds)
+
+            self.reactions = list(map(lambda x: x.strip().split('<-->'), sac1D_SA['reactions'].split(',')))
+            for i in range(len(self.reactions)):
+                self.reactions[i] = list(map(lambda x: x.strip().split('+'), self.reactions[i]))
+            print("All elementary steps contain:", self.reactions)
+
+            self.Energies = list(map(lambda x : x.strip().split(',') , sac1D_SA['Energies'].split(';')))
+            for i in range(len(self.Energies)):
+                self.Energies[i] = list(map(lambda x: float(x.strip()), self.Energies[i]))
+            self.Energies = tuple(self.Energies)
+            print("IS, TS and FS energy for all elementary steps" ,self.Energies)
+
+            self.Freq = list(map(lambda x: x.strip().split(' '), sac1D_SA['Freq'].split(',')))
+            for i in range(len(self.Freq)):
+                self.Freq[i] = list(map(lambda x: float(x), self.Freq[i]))
+            print("All elementary steps' freq is ,", self.Freq)
+
+            self.reactionsKind = tuple(map(lambda x : str(x.strip()), sac1D_SA['reactionsKind'].split(',')))
+            print("Kinds of elementary steps: for calculation of reaction rate K:", self.reactionsKind)

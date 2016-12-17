@@ -6,12 +6,12 @@ do
 mkdir ${i}
 done
 
-for i in $(seq 400 +10 700)
+for i in $(seq 150 +10 700)
 do
 cp -r  sub.kmc config*.txt ./${i}
 done
 
-for i in $(seq 400 +10 700)
+for i in $(seq 150 +10 700)
 do
 cd ${i}
 echo "7c Temperature = ${i}"
