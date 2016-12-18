@@ -1,0 +1,119 @@
+# -*- coding:utf-8 -*-
+
+"""
+@author: Jin-Cheng Liu
+@file: loop.py
+@time: 2016/12/18 12:35
+"""
+
+import random
+import math
+from oneD_SAmodule import kmc
+
+class Loop(object):
+
+    def __init__(self, kmc, rate_const_dict, lat, num_of_avail_sites, time = [0], product = 0):
+        self._rate_const_dict = rate_const_dict
+        self._lat = lat
+        self._num_of_avail_sites = num_of_avail_sites
+        self._kmc = kmc
+        self._loop_n = kmc.LoopNum
+        self._reactions = kmc.reactions
+        self._time = time
+        self._product = product
+
+    def set_accum_rate(self):
+        accum_rate = {}
+        for i in self._num_of_avail_sites.keys():
+            k_accum = len(self._num_of_avail_sites[i]) * self._rate_const_dict[i]
+            accum_rate[i] = k_accum
+        return accum_rate
+
+    def do_random_k(self, accum_rate):
+        u = random.random()
+        k_sum = 0
+        for i in self._num_of_avail_sites.keys():
+            k_sum += accum_rate[i]
+            # print(k_sum, sum(accum_rate.values()))
+            if k_sum > u * sum(accum_rate.values()):
+                react_k = i  # find out which reaction should be process in this kmc loop
+                break
+        return react_k
+
+    def do_random_site(self, react_k):
+        order_of_the_react_site = random.randint(0, len(self._num_of_avail_sites[react_k])-1)
+        # print(order_of_the_react_site, self._num_of_avail_sites[react_k][order_of_the_react_site])
+        return self._num_of_avail_sites[react_k][order_of_the_react_site]
+
+    def update_time(self, accum_rate):
+        t_random = random.random()
+        d_t = (1/sum(accum_rate.values())) * math.log(1/t_random)
+        self._time.append(self._time[-1] + d_t)
+        return None
+
+    def update_lat(self, react_site):
+        react = [ i for i in react_site[0]]   # split react_site[0] : "-0" to ["-","0"]
+        if react[0] == "-":
+            """self._reactions like : [[['1 ', ' CO'], ['2']], [['2 ', ' 0'], ['ts1'], ['3 ', ' 4']]
+             self._reactions[int(react[1])]: select the reaction;
+             self._reactions[int(react[1])][-1]: select the kinds involved in reverse reaction;
+             self._reactions[int(react[1])][-1][0]: select the first kinds involved in reverse reaction;
+             self._reactions[int(react[1])][-1][1]: select the second kinds involved in reverse reaction;
+             self._reactions[int(react[1])][0][0]:  select the first kinds to be;
+             self._reactions[int(react[1])][0][1]:  select the second kinds to be"""
+            self._lat[react_site[1]] = self._reactions[int(react[1])][0][0].strip()
+            if react_site[1] != react_site[2]:  # if the reaction involve two surface site
+                self._lat[react_site[2]] = self._reactions[int(react[1])][0][1].strip()
+        else:
+            self._lat[react_site[1]] = self._reactions[int(react[0])][-1][0].strip()
+            if react_site[1] != react_site[2]:  # if the reaction involve two surface site
+                self._lat[react_site[2]] = self._reactions[int(react[0])][-1][1].strip()
+        return None
+
+    def update_num_of_avail_sites(self):
+        self._num_of_avail_sites = kmc.initialize_num_of_avail_sites(self._kmc, self._lat)
+        return None
+
+    def count_product(self, react_site):
+        if react_site[0] == self._kmc.count_product:
+            self._product += 1
+            #print("+1")
+        elif react_site[0] == "-"+self._kmc.count_product:
+            self._product -= 1
+            #print("-1")
+
+
+
+    def do_kmc_loop(self):
+        print("\n\n&&&&&&&&&&&&&&&&&&&&&&&&&   prepare kMC loop   &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+        print("rate_const_dict :", self._rate_const_dict)
+        print("The lattice :", self._lat)
+        print("number of the available sites for specific elementary reaction is: \n", self._num_of_avail_sites)
+        print("loop number is", self._loop_n)
+
+        print("&&&&&&&&&&&&&&&&&&&&&&&&&      start loop      &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+        for i in range(self._loop_n):
+            accum_rate = self.set_accum_rate()
+            # print("accumulated rate is", accum_rate)
+            self.update_time(accum_rate)
+            # print(self._time)
+
+            react_k = self.do_random_k(accum_rate)
+
+            react_site = self.do_random_site(react_k)
+            #print("kMC step %d, reaction %s is processed on lattice site %d %d." % (i, react_k, react_site[1], react_site[2]))
+            self.update_lat(react_site)
+            #print(self._lat)
+            self.update_num_of_avail_sites()
+            #print(self._num_of_avail_sites)
+            self.count_product(react_site)
+        print(self._lat)
+        print(int(self._kmc.num_SA)-1)
+        print(self._product, self._time[-1])
+        # self.kmc.num_SA-1 is the number of SAs because of periodic condition cutoff the first lattice site.
+        print("tof = ", math.log(self._product/ (self._time[-1] * (int(self._kmc.num_SA)-1)) ))
+
+
+
+
+        return None, None, None

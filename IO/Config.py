@@ -90,7 +90,7 @@ class Parameters(object):
         if self.RunType == '1D_SA':
             sac1D_SA = config['1D_SA']
 
-            self.num_SA = sac1D_SA['number_SA'].split(' ')
+            self.num_SA = sac1D_SA['number_SA'].strip()
 
             self.kinds = tuple(map(lambda x : x.strip(), sac1D_SA['kinds'].split(',')))
             print('surface species contain:', self.kinds)
@@ -115,3 +115,5 @@ class Parameters(object):
 
             self.reactionsKind = tuple(map(lambda x : str(x.strip()), sac1D_SA['reactionsKind'].split(',')))
             print("Kinds of elementary steps: for calculation of reaction rate K:", self.reactionsKind)
+
+            self.count_product = sac1D_SA['countProduct'].strip()

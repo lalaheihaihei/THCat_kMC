@@ -7,8 +7,8 @@ RunType = 1D_SA
 Temperature = 300
 Gas = CO O2 CO2
 GasPressure = 1e-4, 2e-1, 1e-4
-latticeSize = 100, 1
-LoopNum = 1000000
+latticeSize = 10, 1
+LoopNum = 100000
 
 [SA]
 kinds = *OAu + *O,
@@ -44,7 +44,7 @@ reactionsKind = ads, react, des, ads, ads, react, des
 
 
 [1D_SA]
-number_SA = 10
+number_SA = 3
 kinds = 0, 1, 2, 3, 4, 5, 6, 7, 8
 TSkinds = ts1, ts2
 reactions = 1 + CO <--> 2,
@@ -68,3 +68,4 @@ Freq = 2080.84 469.36 444.68 428.53 411.27 383.01 279.30 76.18 55.69,
        2085.42 642.30 468.11 432.19 429.38 237.45 155.17 64.38 53.38,
        2034.28 453.29 388.36 332.62 268.58 186.22 138.16 37.51,
        1660.06 1186.09 716.41 569.16 286.25 237.19 152.20 92.56 31.46
+countProduct = 6
