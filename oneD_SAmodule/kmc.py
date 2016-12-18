@@ -11,7 +11,7 @@ import sys
 
 from oneD_SAmodule import adsorption
 from oneD_SAmodule import reactions
-# from SAmodule import species
+from oneD_SAmodule import loop
 from IO import Config
 # from SAmodule import lattice
 
@@ -74,23 +74,64 @@ def initialize_lattice(kmc):
     return lat
 
 
+def count_of_forwards_reactions(kmc, n_avail, lat, i, j):
+    # for case: 7 --> 8
+    if len(kmc.reactions[i][0]) == 1 and kmc.reactions[i][0][0].strip() in kmc.kinds:
+        if lat[j] == kmc.reactions[i][0][0].strip():
+            n_avail[str(i)] += 1
+    # for case 7 + CO --> 8
+    elif len(kmc.reactions[i][0]) == 2 and kmc.reactions[i][0][-1].strip() not in kmc.kinds:
+        if lat[j] == kmc.reactions[i][0][0].strip():
+            n_avail[str(i)] += 1
+    # for case 7 + 8 --> 9
+    elif len(kmc.reactions[i][0]) == 2 and kmc.reactions[i][0][-1].strip() in kmc.kinds:
+        if lat[j] == kmc.reactions[i][0][0].strip() and lat[j - 1] == kmc.reactions[i][0][1].strip():
+            n_avail[str(i)] += 1
+        elif lat[j] == kmc.reactions[i][0][0].strip() and lat[j + 1] == kmc.reactions[i][0][1].strip():
+            n_avail[str(i)] += 1
+    # for case 7 + 8 + CO --> 10
+    elif len(kmc.reactions[i][0]) == 3 and kmc.reactions[i][0][1].strip() in kmc.kinds:
+        if lat[j] == kmc.reactions[i][0][0].strip() and lat[j - 1] == kmc.reactions[i][0][1].strip():
+            n_avail[str(i)] += 1
+        elif lat[j] == kmc.reactions[i][0][0].strip() and lat[j + 1] == kmc.reactions[i][0][1].strip():
+            n_avail[str(i)] += 1
+    return n_avail
+
+
+def count_of_reverse_reactions(kmc, n_avail, lat, i, j):
+    # for case: 7 --> 8
+    if len(kmc.reactions[i][1]) == 1 and kmc.reactions[i][1][0].strip() in kmc.kinds:
+        if lat[j] == kmc.reactions[i][1][0].strip():
+            n_avail[str(-i)] += 1
+    # for case 7 + CO --> 8
+    elif len(kmc.reactions[i][1]) == 2 and kmc.reactions[i][1][-1].strip() not in kmc.kinds:
+        if lat[j] == kmc.reactions[i][1][0].strip():
+            n_avail[str(-i)] += 1
+    # for case 7 + 8 --> 9
+    elif len(kmc.reactions[i][1]) == 2 and kmc.reactions[i][1][-1].strip() in kmc.kinds:
+        if lat[j] == kmc.reactions[i][1][0].strip() and lat[j - 1] == kmc.reactions[i][1][1].strip():
+            n_avail[str(-i)] += 1
+        elif lat[j] == kmc.reactions[i][1][0].strip() and lat[j + 1] == kmc.reactions[i][1][1].strip():
+            n_avail[str(-i)] += 1
+    # for case 7 + 8 + CO --> 10
+    elif len(kmc.reactions[i][1]) == 3 and kmc.reactions[i][1][1].strip() in kmc.kinds:
+        if lat[j] == kmc.reactions[i][1][0].strip() and lat[j - 1] == kmc.reactions[i][1][1].strip():
+            n_avail[str(-i)] += 1
+        elif lat[j] == kmc.reactions[i][1][0].strip() and lat[j + 1] == kmc.reactions[i][1][1].strip():
+            n_avail[str(-i)] += 1
+    return n_avail
+
+
 def initialize_num_of_avail_sites(kmc, lat):
     n_avail = {}
     for i in range(len(kmc.reactions)):
         n_avail[str(i)] = 0
         n_avail[str(-i)] = 0
     for i in range(len(kmc.reactions)):
-        for j in lat:
-            if j == kmc.reactions[i][0][0].strip():
-                n_avail[str(i)] += 1
-            if j == kmc.reactions[i][-1][0].strip():
-                n_avail[str(-i)] += 1
-    print(n_avail)
+        for j in range(1, len(lat)-1):  # to avoid exceeding of list range
+            n_avail = count_of_forwards_reactions(kmc, n_avail, lat, i, j)
+            n_avail = count_of_reverse_reactions(kmc, n_avail, lat, i, j)
     return n_avail
-
-
-def do_kmc_loop(rate_const, lat, num_of_avail_sites):
-    return None
 
 
 def main():
@@ -117,7 +158,7 @@ def main():
     print(num_of_avail_sites)
 
     #time, productNum, coverageList = \
-    #    do_kmc_loop(rate_const, lat, num_of_avail_sites)
+    #    loop.do_kmc_loop(rate_const, lat, num_of_avail_sites)
 
 
 
