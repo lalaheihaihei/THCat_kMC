@@ -10,7 +10,7 @@ import math
 
 import scipy.constants as sc
 
-from SAmodule import species
+from oneD_SAmodule import reactions
 
 
 class Reactions(object):
@@ -71,3 +71,16 @@ class Reactions(object):
             product2 *= (1 - math.e ** ((-1.23981e-4 * i) / (self.__k * self._T)))
         #print(product1, product2)
         return product1/product2
+
+
+def get_react_rate(kmc, i, T):
+    order_of_the_react = kmc.reactionsKind[:i].count('react')  # to judge which three freq need to be input.
+    input_freq = []
+    for j in [order_of_the_react*3 + 0, order_of_the_react*3 + 1, order_of_the_react*3 + 2]:
+        input_freq.append(kmc.Freq[j])
+    # print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
+    # print(kmc.Energies[i], kmc.reactions[i], T, input_freq)
+    react = reactions.Reactions(kmc.Energies[i], kmc.reactions[i], T, input_freq)
+    # print("For step %d:\tk(forwards) = %.3e,\tk(reverse) = %.3e" % (i, react.forwardK, react.reverseK))
+    return react.forwardK, react.reverseK
+

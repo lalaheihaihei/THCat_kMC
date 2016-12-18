@@ -10,6 +10,7 @@ a class of the
 
 import math
 import scipy.constants as sc
+from oneD_SAmodule import adsorption
 
 
 class Adsorption(object):
@@ -102,3 +103,20 @@ class Adsorption(object):
             # The equilibrium constant K = k(forward)/k(backward)
         desorb_k = self.adsorb_k() / k_equilibrium
         return desorb_k
+
+
+def get_ads_rate(kmc, i, T, P):
+    # print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ads')
+    ads = adsorption.Adsorption(kmc.Energies[i], kmc.reactions[i], T, P[kmc.reactions[i][0][-1].strip()], kmc.reactions[i][0][-1].strip())
+    # print(ads.adsorb_k(), ads.desorb_k())
+    return ads.adsorb_k(), ads.desorb_k()
+
+
+def get_des_rate(kmc, i, T, P):
+    energylist_swap = [kmc.Energies[i][1], kmc.Energies[i][0]]
+    reactions_list_swap = [kmc.reactions[i][1], kmc.reactions[i][0]]
+    # print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+    # print(energylist_swap, reactions_list_swap, T, P[kmc.reactions[i][1][-1].strip()], kmc.reactions[i][1][-1].strip())
+    ads = adsorption.Adsorption(energylist_swap, reactions_list_swap, T, P[kmc.reactions[i][1][-1].strip()], kmc.reactions[i][1][-1].strip())
+    return ads.desorb_k(), ads.adsorb_k()
+

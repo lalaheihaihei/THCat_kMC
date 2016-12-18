@@ -3,7 +3,7 @@ Title = CeO2_stepD_Au
 # 'SA' for single atom catalysis with isolated reaction site.
 # 'SF' for lattice kMC on surface.
 # 'IF' for lattice kMC on interface.
-RunType = SA
+RunType = 1D_SA
 Temperature = 300
 Gas = CO O2 CO2
 GasPressure = 1e-4, 2e-1, 1e-4

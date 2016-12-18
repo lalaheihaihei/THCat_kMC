@@ -32,34 +32,6 @@ def add_list(kmc):
     return None
 
 
-def get_ads_rate(kmc, i, T, P):
-    # print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ads')
-    ads = adsorption.Adsorption(kmc.Energies[i], kmc.reactions[i], T, P[kmc.reactions[i][0][-1].strip()], kmc.reactions[i][0][-1].strip())
-    # print(ads.adsorb_k(), ads.desorb_k())
-    return ads.adsorb_k(), ads.desorb_k()
-
-
-def get_react_rate(kmc, i, T):
-    order_of_the_react = kmc.reactionsKind[:i].count('react')  # to judge which three freq need to be input.
-    input_freq = []
-    for j in [order_of_the_react*3 + 0, order_of_the_react*3 + 1, order_of_the_react*3 + 2]:
-        input_freq.append(kmc.Freq[j])
-    # print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
-    # print(kmc.Energies[i], kmc.reactions[i], T, input_freq)
-    react = reactions.Reactions(kmc.Energies[i], kmc.reactions[i], T, input_freq)
-    # print("For step %d:\tk(forwards) = %.3e,\tk(reverse) = %.3e" % (i, react.forwardK, react.reverseK))
-    return react.forwardK, react.reverseK
-
-
-def get_des_rate(kmc, i, T, P):
-    energylist_swap = [kmc.Energies[i][1], kmc.Energies[i][0]]
-    reactions_list_swap = [kmc.reactions[i][1], kmc.reactions[i][0]]
-    # print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-    # print(energylist_swap, reactions_list_swap, T, P[kmc.reactions[i][1][-1].strip()], kmc.reactions[i][1][-1].strip())
-    ads = adsorption.Adsorption(energylist_swap, reactions_list_swap, T, P[kmc.reactions[i][1][-1].strip()], kmc.reactions[i][1][-1].strip())
-    return ads.desorb_k(), ads.adsorb_k()
-
-
 def add_reaction(kmc, T, P, rate_const = []):
     """
 
@@ -75,11 +47,11 @@ def add_reaction(kmc, T, P, rate_const = []):
     print(kmc.Freq)
     for i in range(len(kmc.reactions)):
         if kmc.reactionsKind[i] == 'ads':
-            k1, k2 = get_ads_rate(kmc, i, T, P)
+            k1, k2 = adsorption.get_ads_rate(kmc, i, T, P)
         elif kmc.reactionsKind[i] == 'react':
-            k1, k2 = get_react_rate(kmc, i, T)
+            k1, k2 = reactions.get_react_rate(kmc, i, T)
         elif kmc.reactionsKind[i] == 'des':
-            k1, k2 = get_des_rate(kmc, i, T, P)
+            k1, k2 = adsorption.get_des_rate(kmc, i, T, P)
         else:
             raise ValueError('Error: check the reactionKind')
         for j in [k1, k2]:
@@ -88,11 +60,33 @@ def add_reaction(kmc, T, P, rate_const = []):
 
 
 def initialize_lattice(kmc):
-    return None
+    """
+    ATTENTION: this section should be define by users.
+    :param kmc:
+    :return:
+    """
+    lat = []
+    for i in range(kmc.latticeSize[0]):
+        if i % 5. < 0.1: # if i/5 = 0
+            lat.append('1')
+        else:
+            lat.append('0')
+    return lat
 
 
 def initialize_num_of_avail_sites(kmc, lat):
-    return None
+    n_avail = {}
+    for i in range(len(kmc.reactions)):
+        n_avail[str(i)] = 0
+        n_avail[str(-i)] = 0
+    for i in range(len(kmc.reactions)):
+        for j in lat:
+            if j == kmc.reactions[i][0][0].strip():
+                n_avail[str(i)] += 1
+            if j == kmc.reactions[i][-1][0].strip():
+                n_avail[str(-i)] += 1
+    print(n_avail)
+    return n_avail
 
 
 def do_kmc_loop(rate_const, lat, num_of_avail_sites):
@@ -115,10 +109,12 @@ def main():
     for i in range(len(kmc.reactionsKind)):
         print("For step %d:\tk(forward) = %.3e,\tk(backward) = %.3e," % ( i, rate_const[i*2], rate_const[i*2 + 1]))
 
-    #lat = initialize_lattice(kmc)
+    lat = initialize_lattice(kmc)
+    print(lat)
 
     '''num_of_avail_sites should be like: [[0,2,3,6],[1,5],[4,7]...]'''
-    #num_of_avail_sites = initialize_num_of_avail_sites(kmc, lat)
+    num_of_avail_sites = initialize_num_of_avail_sites(kmc, lat)
+    print(num_of_avail_sites)
 
     #time, productNum, coverageList = \
     #    do_kmc_loop(rate_const, lat, num_of_avail_sites)
