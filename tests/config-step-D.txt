@@ -3,12 +3,12 @@ Title = CeO2_stepD_Au
 # 'SA' for single atom catalysis with isolated reaction site.
 # 'SF' for lattice kMC on surface.
 # 'IF' for lattice kMC on interface.
-RunType = SA
+RunType = 1D_SA
 Temperature = 300
 Gas = CO O2 CO2
 GasPressure = 1e-4, 2e-1, 1e-4
-latticeSize = 7, 1
-LoopNum = 300000
+latticeSize = 6, 1
+LoopNum = 1000000
 
 [SA]
 kinds = *OAu + *O,
@@ -44,12 +44,12 @@ reactionsKind = ads, react, des, ads, ads, react, des
 
 
 [1D_SA]
-number_SA = 3
+number_SA = 2
 kinds = 0, 1, 2, 3, 4, 5, 6, 7, 8
 TSkinds = ts1, ts2
 reactions = 1 + CO <--> 2,
             2 + 0 <--> ts1 <--> 3 + 4,
-            3 + 4 <--> 5 + 0 + CO2,
+            3 + 4 <--> 0 + 5 + CO2,
             5 + O2 <--> 6,
             6 + CO <--> 7,
             7 <--> ts2 <--> 8,
@@ -70,3 +70,4 @@ Freq = 2080.84 469.36 444.68 428.53 411.27 383.01 279.30 76.18 55.69,
        1660.06 1186.09 716.41 569.16 286.25 237.19 152.20 92.56 31.46
 countProduct = 6
 notCountCover = 0, 4
+periodic = 1

@@ -19,7 +19,6 @@ from IO import Config
 def test_reaction_number(kmc):
     """
     Test the input reaction number. Whether the n(ads+des+rea) = n(reactions)
-
     :param kmc: Instance of Parameters
     :return: None
     """
@@ -28,17 +27,14 @@ def test_reaction_number(kmc):
     return None
 
 
-def add_list(kmc):
-    return None
-
-
 def add_reaction(kmc, T, P, rate_const = [], rate_const_dict = {}):
     """
-
-    :param kmc:
-    :param T:
-    :param P:
-    :return:
+    Calculate rate constants of all the elementary reaction step.
+    :param kmc: object kmc include all input information
+    :param T: temperature
+    :param P: pressure
+    :return: rate_const: list include all k.
+             rate_const_dict: dict like {'reaction step': k, '-0': 8.96e-09, '6': 3.69e+33, '-6': 10.31,}
     """
     print('####################################################################')
     print("all elementary reactions energy are\n", kmc.Energies)
@@ -59,11 +55,14 @@ def add_reaction(kmc, T, P, rate_const = [], rate_const_dict = {}):
     return rate_const, rate_const_dict
 
 
-def initialize_lattice(kmc):
+def initialize_lattice(kmc, count_cut_num_of_active = 0):
     """
     ATTENTION: this section should be define by users.
     :param kmc:
-    :return:
+    :return: the number_SA in config file does not the final active site num,
+     because the code take first and last element in lat to be "-1" or PBC.
+     Thus count_cut_num_of_active is used to record the cut number of active site,
+     which is useful for final coverage calculation.
     """
     lat = []
     for i in range(kmc.latticeSize[0]):
@@ -71,9 +70,18 @@ def initialize_lattice(kmc):
             lat.append('1')
         else:
             lat.append('0')
-    lat[0] = '-1'  # non-periodic
-    lat[-1] = '-1'  # non-periodic
-    return lat
+    for i in [0, -1]:
+        if lat[i] == "1":
+            count_cut_num_of_active += 1
+    if kmc.periodic == "0":
+        lat[0] = '-1'  # non-periodic
+        lat[-1] = '-1'  # non-periodic
+    elif kmc.periodic == "1":
+        lat[0] = lat[-2]
+        lat[-1] = lat[1]
+    else:
+        raise ValueError("Error: please check input periodic condition.")
+    return lat, count_cut_num_of_active
 
 
 def count_of_forwards_reactions(kmc, n_avail, lat, i, j):
@@ -142,10 +150,12 @@ def count_of_reverse_reactions(kmc, n_avail, lat, i, j):
 def initialize_num_of_avail_sites(kmc, lat):
     n_avail = {}                        # dict to record which react happen on which site {'-0':[1,5,8,...],'0':[]}
     for i in range(len(kmc.reactions)):
-        n_avail[str(i)] = []            # list to record site
-        n_avail['-'+str(i)] = []        # list to record site
+        n_avail[str(i)] = []            # creat list to record site
+        n_avail['-'+str(i)] = []        # creat list to record site
     for i in range(len(kmc.reactions)): # loop all reactions
         for j in range(1, len(lat)-1):  # loop all lattice ,cutoff first and last to avoid exceeding of list range
+            # for periodic condition. lat[0] is lat[-2], lat[-1] is lat[1].
+            # for nonperiodic conditon. lat[0] = lat[-1] = "-1"
             n_avail = count_of_forwards_reactions(kmc, n_avail, lat, i, j)
             n_avail = count_of_reverse_reactions(kmc, n_avail, lat, i, j)
     return n_avail
@@ -160,19 +170,16 @@ def main():
     # Test the reaction number.
     test_reaction_number(kmc)
 
-    add_list(kmc)
-
     rate_const, rate_const_dict = add_reaction(kmc, T, P)
-    print('the list of rate constant is ', rate_const)
     for i in range(len(kmc.reactionsKind)):
         print("For step %d:\tk(forward) = %.3e,\tk(backward) = %.3e," % ( i, rate_const[i*2], rate_const[i*2 + 1]))
 
-    lat = initialize_lattice(kmc)
+    lat, count_cut_num_of_active = initialize_lattice(kmc)
 
-    '''num_of_avail_sites should be like: [[0,2,3,6],[1,5],[4,7]...]'''
+    # num_of_avail_sites should be like: [[0,2,3,6],[1,5],[4,7]...]
     num_of_avail_sites = initialize_num_of_avail_sites(kmc, lat)
 
-    kmc_loop = loop.Loop(kmc, rate_const_dict, lat, num_of_avail_sites)
+    kmc_loop = loop.Loop(kmc, rate_const_dict, lat, num_of_avail_sites, count_cut_num_of_active)
     print(kmc_loop.do_kmc_loop())
 
 

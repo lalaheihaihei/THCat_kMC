@@ -12,13 +12,14 @@ from oneD_SAmodule import kmc
 
 class Loop(object):
 
-    def __init__(self, kmc, rate_const_dict, lat, num_of_avail_sites, time = [0], product = 0):
+    def __init__(self, kmc, rate_const_dict, lat, num_of_avail_sites, count_cut_num_of_active, time = [0], product = 0):
         self._rate_const_dict = rate_const_dict
         self._lat = lat
         self._num_of_avail_sites = num_of_avail_sites
         self._kmc = kmc
         self._loop_n = kmc.LoopNum
         self._reactions = kmc.reactions
+        self._count_cut_num_of_active = count_cut_num_of_active
         self._time = time
         self._product = product
         self._coverage_list = list(map(lambda x: 0, self._kmc.kinds)) # initialize the coverage list
@@ -76,6 +77,17 @@ class Loop(object):
             self._lat[react_site[1]] = self._reactions[int(react[0])][-1][0].strip()
             if react_site[1] != react_site[2]:  # if the reaction involve two surface site
                 self._lat[react_site[2]] = self._reactions[int(react[0])][-1][1].strip()
+        if self._kmc.periodic == "1":
+
+            if 0 in react_site:
+                self._lat[-2] = self._lat[0]
+                self._lat[-1] = self._lat[1]
+            elif len(self._lat)-1 in react_site:
+                self._lat[0] = self._lat[-2]
+                self._lat[1] = self._lat[-1]
+            else:
+                self._lat[0] = self._lat[-2]
+                self._lat[-1] = self._lat[1]
         return None
 
     def update_num_of_avail_sites(self):
@@ -116,15 +128,17 @@ class Loop(object):
             react_site = self.do_random_site(react_k)
             # print("kMC step %d, reaction %s is processed on lattice site %d %d." % (i, react_k, react_site[1], react_site[2]))
             self.update_lat(react_site)
-            # print(self._lat)
+            # print(react_site, self._lat)
             self.update_num_of_avail_sites()
-            # print(self._num_of_avail_sites)
+            # print(self._num_of_avail_sites, "\n")
             self.count_product(react_site)
         print("lattice:", self._lat)
         print("number of SAs:", int(self._kmc.num_SA)-1)
         print("there are %d products in %.2f s" % (self._product, self._time[-1]))
         # self.kmc.num_SA-1 is the number of SAs because of periodic condition cutoff the first lattice site.
-        print("tof = ", math.log(self._product/ (self._time[-1] * (int(self._kmc.num_SA)-1)) ))
+        print("the real active sites number is %d - %d = %d" % \
+              (int(self._kmc.num_SA), self._count_cut_num_of_active, int(self._kmc.num_SA) - self._count_cut_num_of_active))
+        print("tof = ", math.log(self._product/ (self._time[-1] * (int(self._kmc.num_SA)-self._count_cut_num_of_active)) ))
         self._coverage_list = list(map(lambda x: x/sum(self._coverage_list), self._coverage_list))
         for i in range(len(self._coverage_list)):
             print("coverage of surface species %s is %.3f:" % (self._kmc.kinds[i], self._coverage_list[i]))

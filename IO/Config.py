@@ -119,3 +119,5 @@ class Parameters(object):
             self.count_product = sac1D_SA['countProduct'].strip()
 
             self.not_count_cover = tuple(map(lambda x : str(x.strip()), sac1D_SA['notCountCover'].split(',')))
+
+            self.periodic = sac1D_SA['periodic'].strip()
