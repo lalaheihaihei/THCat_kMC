@@ -88,6 +88,7 @@ class Parameters(object):
 
         # Set some Surface_kMC parameters for kMC.
         if self.RunType == '1D_SA':
+            print("###########################    1D_SA module    ########################################")
             sac1D_SA = config['1D_SA']
 
             self.num_SA = sac1D_SA['number_SA'].strip()
@@ -106,7 +107,7 @@ class Parameters(object):
             for i in range(len(self.Energies)):
                 self.Energies[i] = list(map(lambda x: float(x.strip()), self.Energies[i]))
             self.Energies = tuple(self.Energies)
-            print("IS, TS and FS energy for all elementary steps" ,self.Energies)
+            print("energy for all elementary steps" ,self.Energies)
 
             self.Freq = list(map(lambda x: x.strip().split(' '), sac1D_SA['Freq'].split(',')))
             for i in range(len(self.Freq)):

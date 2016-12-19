@@ -142,8 +142,4 @@ class Loop(object):
         self._coverage_list = list(map(lambda x: x/sum(self._coverage_list), self._coverage_list))
         for i in range(len(self._coverage_list)):
             print("coverage of surface species %s is %.3f:" % (self._kmc.kinds[i], self._coverage_list[i]))
-
-
-
-
-        return None, None, None
+        return None
