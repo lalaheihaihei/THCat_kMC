@@ -117,3 +117,5 @@ class Parameters(object):
             print("Kinds of elementary steps: for calculation of reaction rate K:", self.reactionsKind)
 
             self.count_product = sac1D_SA['countProduct'].strip()
+
+            self.not_count_cover = tuple(map(lambda x : str(x.strip()), sac1D_SA['notCountCover'].split(',')))

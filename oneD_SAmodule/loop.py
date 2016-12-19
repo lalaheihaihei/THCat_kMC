@@ -21,6 +21,7 @@ class Loop(object):
         self._reactions = kmc.reactions
         self._time = time
         self._product = product
+        self._coverage_list = list(map(lambda x: 0, self._kmc.kinds)) # initialize the coverage list
 
     def set_accum_rate(self):
         accum_rate = {}
@@ -49,6 +50,13 @@ class Loop(object):
         t_random = random.random()
         d_t = (1/sum(accum_rate.values())) * math.log(1/t_random)
         self._time.append(self._time[-1] + d_t)
+        return d_t
+
+    def update_coverage(self, d_t):
+        # add a time dependent coverage: see Top Catal (2014) 57:159–170 equation (6).
+        for i in range(len(self._kmc.kinds)):
+            if self._kmc.kinds[i] not in self._kmc.not_count_cover:
+                self._coverage_list[i] += d_t * self._lat.count(self._kmc.kinds[i])
         return None
 
     def update_lat(self, react_site):
@@ -71,6 +79,10 @@ class Loop(object):
         return None
 
     def update_num_of_avail_sites(self):
+        """
+        this step is quite slow because of re-evaluate the n_avail by search whole lattice.
+        :return:
+        """
         self._num_of_avail_sites = kmc.initialize_num_of_avail_sites(self._kmc, self._lat)
         return None
 
@@ -83,7 +95,6 @@ class Loop(object):
             #print("-1")
 
 
-
     def do_kmc_loop(self):
         print("\n\n&&&&&&&&&&&&&&&&&&&&&&&&&   prepare kMC loop   &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
         print("rate_const_dict :", self._rate_const_dict)
@@ -92,26 +103,31 @@ class Loop(object):
         print("loop number is", self._loop_n)
 
         print("&&&&&&&&&&&&&&&&&&&&&&&&&      start loop      &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+
         for i in range(self._loop_n):
             accum_rate = self.set_accum_rate()
             # print("accumulated rate is", accum_rate)
-            self.update_time(accum_rate)
+            d_t = self.update_time(accum_rate)
+            self.update_coverage(d_t)
             # print(self._time)
 
             react_k = self.do_random_k(accum_rate)
 
             react_site = self.do_random_site(react_k)
-            #print("kMC step %d, reaction %s is processed on lattice site %d %d." % (i, react_k, react_site[1], react_site[2]))
+            # print("kMC step %d, reaction %s is processed on lattice site %d %d." % (i, react_k, react_site[1], react_site[2]))
             self.update_lat(react_site)
-            #print(self._lat)
+            # print(self._lat)
             self.update_num_of_avail_sites()
-            #print(self._num_of_avail_sites)
+            # print(self._num_of_avail_sites)
             self.count_product(react_site)
-        print(self._lat)
-        print(int(self._kmc.num_SA)-1)
-        print(self._product, self._time[-1])
+        print("lattice:", self._lat)
+        print("number of SAs:", int(self._kmc.num_SA)-1)
+        print("there are %d products in %.2f s" % (self._product, self._time[-1]))
         # self.kmc.num_SA-1 is the number of SAs because of periodic condition cutoff the first lattice site.
         print("tof = ", math.log(self._product/ (self._time[-1] * (int(self._kmc.num_SA)-1)) ))
+        self._coverage_list = list(map(lambda x: x/sum(self._coverage_list), self._coverage_list))
+        for i in range(len(self._coverage_list)):
+            print("coverage of surface species %s is %.3f:" % (self._kmc.kinds[i], self._coverage_list[i]))
 
 
 

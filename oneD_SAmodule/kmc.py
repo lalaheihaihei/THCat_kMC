@@ -41,10 +41,9 @@ def add_reaction(kmc, T, P, rate_const = [], rate_const_dict = {}):
     :return:
     """
     print('####################################################################')
-    print(kmc.Energies)
-    print(kmc.reactions)
-    print(kmc.reactionsKind)
-    print(kmc.Freq)
+    print("all elementary reactions energy are\n", kmc.Energies)
+    print("all elementary reactions in list are\n:", kmc.reactions)
+    # print(kmc.Freq)
     for i in range(len(kmc.reactions)):
         if kmc.reactionsKind[i] == 'ads':
             k1, k2 = adsorption.get_ads_rate(kmc, i, T, P)

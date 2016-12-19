@@ -69,7 +69,7 @@ class Reactions(object):
             product1 *= (1 - math.e ** ((-1.23981e-4 * i) / (self.__k * self._T)))
         for i in freq2:
             product2 *= (1 - math.e ** ((-1.23981e-4 * i) / (self.__k * self._T)))
-        #print(product1, product2)
+        # print(product1, product2)
         return product1/product2
 
 
