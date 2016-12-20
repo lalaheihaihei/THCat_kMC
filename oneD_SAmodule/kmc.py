@@ -153,25 +153,25 @@ def count_of_reverse_reactions(kmc, n_avail, lat, i, j):
     """
     see notes in def count_of_forwards_reactions
     """
-    # for case: 7 --> 8
-    if len(kmc.reactions[i][1]) == 1 and kmc.reactions[i][1][0].strip() in kmc.kinds:
-        if lat[j] == kmc.reactions[i][1][0].strip():
+    # for case: 7 <-- 8
+    if len(kmc.reactions[i][-1]) == 1 and kmc.reactions[i][-1][0].strip() in kmc.kinds:
+        if lat[j] == kmc.reactions[i][-1][0].strip():
             n_avail['-'+str(i)].append(["-"+str(i), j, j])
-    # for case 7 + CO --> 8
-    elif len(kmc.reactions[i][1]) == 2 and kmc.reactions[i][1][-1].strip() not in kmc.kinds:
-        if lat[j] == kmc.reactions[i][1][0].strip():
+    # for case 7 <-- 8 + CO
+    elif len(kmc.reactions[i][-1]) == 2 and kmc.reactions[i][-1][-1].strip() not in kmc.kinds:
+        if lat[j] == kmc.reactions[i][-1][0].strip():
             n_avail['-'+str(i)].append(["-"+str(i), j, j])
-    # for case 7 + 8 --> 9
-    elif len(kmc.reactions[i][1]) == 2 and kmc.reactions[i][1][-1].strip() in kmc.kinds:
-        if lat[j] == kmc.reactions[i][1][0].strip() and lat[j - 1] == kmc.reactions[i][1][1].strip():
+    # for case 7 <-- 9 + 8
+    elif len(kmc.reactions[i][-1]) == 2 and kmc.reactions[i][-1][-1].strip() in kmc.kinds:
+        if lat[j] == kmc.reactions[i][-1][0].strip() and lat[j - 1] == kmc.reactions[i][-1][1].strip():
             n_avail['-'+str(i)].append(["-"+str(i), j, j-1])
-        if lat[j] == kmc.reactions[i][1][0].strip() and lat[j + 1] == kmc.reactions[i][1][1].strip():
+        if lat[j] == kmc.reactions[i][-1][0].strip() and lat[j + 1] == kmc.reactions[i][-1][1].strip():
             n_avail['-'+str(i)].append(["-"+str(i), j, j+1])
-    # for case 7 + 8 + CO --> 10
-    elif len(kmc.reactions[i][1]) == 3 and kmc.reactions[i][1][1].strip() in kmc.kinds:
-        if lat[j] == kmc.reactions[i][1][0].strip() and lat[j - 1] == kmc.reactions[i][1][1].strip():
+    # for case 7 <-- 10 + 8 + CO
+    elif len(kmc.reactions[i][-1]) == 3 and kmc.reactions[i][-1][1].strip() in kmc.kinds:
+        if lat[j] == kmc.reactions[i][-1][0].strip() and lat[j - 1] == kmc.reactions[i][-1][1].strip():
             n_avail['-'+str(i)].append(["-"+str(i), j, j-1])
-        if lat[j] == kmc.reactions[i][1][0].strip() and lat[j + 1] == kmc.reactions[i][1][1].strip():
+        if lat[j] == kmc.reactions[i][-1][0].strip() and lat[j + 1] == kmc.reactions[i][-1][1].strip():
             n_avail['-'+str(i)].append(["-"+str(i), j, j+1])
     return n_avail
 

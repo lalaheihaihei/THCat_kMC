@@ -8,7 +8,7 @@ Temperature = 300
 Gas = CO O2 CO2
 GasPressure = 1e-4, 2e-1, 1e-4
 latticeSize = 6, 1
-LoopNum = 1000000
+LoopNum = 100000
 
 [SA]
 kinds = *OAu + *O,

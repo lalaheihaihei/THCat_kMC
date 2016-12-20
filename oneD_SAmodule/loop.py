@@ -4,7 +4,7 @@
 @author: Jin-Cheng Liu
 @file: loop.py
 @time: 2016/12/18 12:35
-class controls the kmc loop. Need to transfer to fortran/C/C++/Cython further ro accelerate loop.
+class controls the kmc loop. Need to transfer to fortran/C/C++/Cython further to accelerate loop.
 """
 
 import random
@@ -15,14 +15,13 @@ class Loop(object):
 
     def __init__(self, kmc, rate_const_dict, lat, num_of_avail_sites, count_cut_num_of_active, time = [0], product = 0):
         """
-
         :param kmc: input parameters instance
         :param rate_const_dict: all reaction rate constants
-        :param lat:
-        :param num_of_avail_sites:
-        :param count_cut_num_of_active:
-        :param time:
-        :param product:
+        :param lat: lattice list
+        :param num_of_avail_sites:  {'-6': [['-6', 3, 3]], '5': [], '-2': []...}
+        :param count_cut_num_of_active: active site at lat[0] or lat[-1] need to be cut off
+        :param time: list include accumulated simulation time for evergy step
+        :param product: number of product
         """
         self._rate_const_dict = rate_const_dict
         self._lat = lat
@@ -178,6 +177,7 @@ class Loop(object):
             accum_rate = self.set_accum_rate()
             # print("accumulated rate is", accum_rate)
             d_t = self.update_time(accum_rate)
+            # print(accum_rate)
             self.update_coverage(d_t)
             # print(self._time)
 
@@ -186,7 +186,7 @@ class Loop(object):
             react_site = self.do_random_site(react_k)
             # print("kMC step %d, reaction %s is processed on lattice site %d %d." % (i, react_k, react_site[1], react_site[2]))
             self.update_lat(react_site)
-            print(react_site, self._lat)
+            # print(react_site, self._lat)
             self.update_num_of_avail_sites()
             # print(self._num_of_avail_sites, "\n")
             self.count_product(react_site)
