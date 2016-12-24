@@ -19,7 +19,7 @@ class Parameters(object):
     Using a class to handle a bunch of parameters might be a good idea.
     """
 
-    def __init__(self, filename='config-Au12.txt'):
+    def __init__(self, filename='config-TiO2.txt'):
         """
         Default value for parameters
         """
@@ -57,8 +57,6 @@ class Parameters(object):
         self.LoopNum = int(secCommon['LoopNum'].strip())
         print('Loop number of kMC: %d' % (self.LoopNum))
 
-
-
         # Set some SA_kMC parameters for kMC.
         if self.RunType == 'SA':
             sacSA = config['SA']
@@ -85,8 +83,7 @@ class Parameters(object):
             self.reactionsKind = tuple(map(lambda x : str(x.strip()), sacSA['reactionsKind'].split(',')))
             print(self.reactionsKind)
 
-
-        # Set some Surface_kMC parameters for kMC.
+        # Set some 1D_SA_kMC parameters for kMC.
         if self.RunType == '1D_SA':
             print("###########################    1D_SA module    ########################################")
             sac1D_SA = config['1D_SA']
@@ -122,3 +119,59 @@ class Parameters(object):
             self.not_count_cover = tuple(map(lambda x : str(x.strip()), sac1D_SA['notCountCover'].split(',')))
 
             self.periodic = sac1D_SA['periodic'].strip()
+
+        # Set some Surface_kMC parameters for kMC.
+        if self.RunType == 'SF':
+            print("###########################    SF module    ########################################")
+            SF = config['SF']
+
+            self.num_SA = SF['number_SA'].strip()
+
+            self.kinds = SF['kinds'].split(',')
+            if len(self.kinds) == 1:
+                self.kinds = self.kinds[0].split('-')
+                self.kinds = tuple(map(lambda x: int(x.strip()), self.kinds))
+                self.kinds = [str(i) for i in range(self.kinds[0], self.kinds[1]+1)]
+                print('surface species contain:', self.kinds)
+            else:
+                self.kinds = tuple(map(lambda x: x.strip(), SF['kinds'].split(',')))
+                print('surface species contain:', self.kinds)
+
+            self.reactions = list(map(lambda x: x.strip(), SF['reactions'].split('\n')))
+            for i in range(len(self.reactions)):
+                self.reactions[i] = self.reactions[i].split(";")
+                self.reactions[i][0] = self.reactions[i][0].split('<-->')
+                for j in range(len(self.reactions[i][0])):
+                    self.reactions[i][0][j] = list(map(lambda x: x.strip(), self.reactions[i][0][j].split('+')))
+                self.reactions[i][1] = self.reactions[i][1].strip()
+                self.reactions[i][2] = list(map(lambda x: x.strip(), self.reactions[i][2].split(",")))
+
+
+            #    self.reactions[i] = list(map(lambda x: x.split(';'), self.reactions[i]))
+            print("All elementary steps contain:", self.reactions)
+
+
+'''
+            self.Energies = list(map(lambda x: x.strip().split(','), SF['Energies'].split(';')))
+            for i in range(len(self.Energies)):
+                self.Energies[i] = list(map(lambda x: float(x.strip()), self.Energies[i]))
+            self.Energies = tuple(self.Energies)
+            print("energy for all elementary steps", self.Energies)
+
+            self.Freq = list(map(lambda x: x.strip().split(' '), SF['Freq'].split(',')))
+            for i in range(len(self.Freq)):
+                self.Freq[i] = list(map(lambda x: float(x), self.Freq[i]))
+            print("All elementary steps' freq is ,", self.Freq)
+
+            self.reactionsKind = tuple(map(lambda x: str(x.strip()), SF['reactionsKind'].split(',')))
+            print("Kinds of elementary steps: for calculation of reaction rate K:", self.reactionsKind)
+
+            self.count_product = SF['countProduct'].strip()
+
+            self.not_count_cover = tuple(map(lambda x: str(x.strip()), SF['notCountCover'].split(',')))
+
+            self.periodic = SF['periodic'].strip()
+'''
+
+def not_empty(self, s):
+    return s and s.strip()
