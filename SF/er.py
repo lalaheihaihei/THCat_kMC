@@ -10,10 +10,10 @@ a class of the
 
 import math
 import scipy.constants as sc
-from oneD_SAmodule import adsorption
+from SF import er
 
 
-class Adsorption(object):
+class ER(object):
 
     def __init__(self, energies, reactions, temperature, pressure, gas_kind='CO'):
         self._energies = energies
@@ -68,7 +68,7 @@ class Adsorption(object):
         return mu_ev_p
 
     def delta_g(self):
-        return self._energies[1] - (self._energies[0] + self.gas_mu())
+        return self._energies[-1] - (self._energies[0] + self.gas_mu())
 
     def adsorb_k(self):
         if self._gas_kind == 'CO':
@@ -89,9 +89,12 @@ class Adsorption(object):
             mass = 28.054
         elif self._gas_kind == 'C2H6':
             mass = 30.07
+        elif self._gas_kind == 'H2O':
+            mass = 18.016
         else:
             raise ValueError('Error, cannot recongnize the gas molecule.')
-        s = 0.5  # sticking coefficient, we assume S = 0.5 for all the species
+        k = sc.physical_constants['Boltzmann constant in eV/K'][0]
+        s = math.e ** (-self._energies[1]/(k*self._T))  # sticking coefficient, we assume S = 0.5 for all the species
         area = (0.3 * 10e-9) ** 2  # the area of the adsorption site
         m = (mass / 1000) / sc.physical_constants['Avogadro constant'][0]  # mass
         k = sc.physical_constants['Boltzmann constant'][0]  # boltzmann constant
@@ -105,19 +108,10 @@ class Adsorption(object):
         return desorb_k
 
 
-def get_ads_rate(kmc, i, T, P):
+def get_rate(kmc, i, T, P):
     # print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ads')
-    print(kmc.Energies[i], kmc.reactions[i])
-    ads = adsorption.Adsorption(kmc.Energies[i], kmc.reactions[i], T, P[kmc.reactions[i][0][-1].strip()], kmc.reactions[i][0][-1].strip())
+    # print(kmc.reactions[i][2], kmc.reactions[i][0], T, P[kmc.reactions[i][0][0][-1].strip()], kmc.reactions[i][0][0][-1].strip())
+    ads = er.ER(kmc.reactions[i][2], kmc.reactions[i][0],\
+        T, P[kmc.reactions[i][0][0][-1].strip()], kmc.reactions[i][0][0][-1].strip())
     # print(ads.adsorb_k(), ads.desorb_k())
     return ads.adsorb_k(), ads.desorb_k()
-
-
-def get_des_rate(kmc, i, T, P):
-    energylist_swap = [kmc.Energies[i][1], kmc.Energies[i][0]]
-    reactions_list_swap = [kmc.reactions[i][1], kmc.reactions[i][0]]
-    # print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-    # print(energylist_swap, reactions_list_swap, T, P[kmc.reactions[i][1][-1].strip()], kmc.reactions[i][1][-1].strip())
-    ads = adsorption.Adsorption(energylist_swap, reactions_list_swap, T, P[kmc.reactions[i][1][-1].strip()], kmc.reactions[i][1][-1].strip())
-    return ads.desorb_k(), ads.adsorb_k()
-

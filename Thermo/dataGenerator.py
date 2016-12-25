@@ -245,4 +245,4 @@ def generate(T1=300, T2=1000, per=10, lib='CO_g:298-1300'):
     for i in range(T1, T2, per):
         print(i, ' ', S(i, shomate_params[lib]), ' ', H(i, shomate_params[lib]))
 
-generate(300, 1210, 10, 'C2H2_g:298-1100')
+generate(500, 1710, 10, 'H2O_g:100-500')

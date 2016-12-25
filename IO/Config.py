@@ -125,6 +125,8 @@ class Parameters(object):
             print("###########################    SF module    ########################################")
             SF = config['SF']
 
+            self.surface_kind = SF["surfaceKind"].strip()
+
             self.num_SA = SF['number_SA'].strip()
 
             self.kinds = SF['kinds'].split(',')
@@ -151,27 +153,20 @@ class Parameters(object):
             print("All elementary steps contain:", self.reactions)
 
 
-'''
-            self.Energies = list(map(lambda x: x.strip().split(','), SF['Energies'].split(';')))
-            for i in range(len(self.Energies)):
-                self.Energies[i] = list(map(lambda x: float(x.strip()), self.Energies[i]))
-            self.Energies = tuple(self.Energies)
-            print("energy for all elementary steps", self.Energies)
+
 
             self.Freq = list(map(lambda x: x.strip().split(' '), SF['Freq'].split(',')))
             for i in range(len(self.Freq)):
                 self.Freq[i] = list(map(lambda x: float(x), self.Freq[i]))
             print("All elementary steps' freq is ,", self.Freq)
 
-            self.reactionsKind = tuple(map(lambda x: str(x.strip()), SF['reactionsKind'].split(',')))
-            print("Kinds of elementary steps: for calculation of reaction rate K:", self.reactionsKind)
 
             self.count_product = SF['countProduct'].strip()
 
             self.not_count_cover = tuple(map(lambda x: str(x.strip()), SF['notCountCover'].split(',')))
 
             self.periodic = SF['periodic'].strip()
-'''
+
 
 def not_empty(self, s):
     return s and s.strip()

@@ -10,7 +10,7 @@ a class of the
 
 import math
 import scipy.constants as sc
-from oneD_SAmodule import adsorption
+from SF import adsorption
 
 
 class Adsorption(object):
@@ -89,6 +89,8 @@ class Adsorption(object):
             mass = 28.054
         elif self._gas_kind == 'C2H6':
             mass = 30.07
+        elif self._gas_kind == 'H2O':
+            mass = 18.016
         else:
             raise ValueError('Error, cannot recongnize the gas molecule.')
         s = 0.5  # sticking coefficient, we assume S = 0.5 for all the species
@@ -107,17 +109,17 @@ class Adsorption(object):
 
 def get_ads_rate(kmc, i, T, P):
     # print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ads')
-    print(kmc.Energies[i], kmc.reactions[i])
-    ads = adsorption.Adsorption(kmc.Energies[i], kmc.reactions[i], T, P[kmc.reactions[i][0][-1].strip()], kmc.reactions[i][0][-1].strip())
+    print(kmc.reactions[i][2], kmc.reactions[i][0], T, P[kmc.reactions[i][0][0][-1].strip()], kmc.reactions[i][0][0][-1].strip())
+    ads = adsorption.Adsorption(kmc.reactions[i][2], kmc.reactions[i][0], T, P[kmc.reactions[i][0][0][-1].strip()], kmc.reactions[i][0][0][-1].strip())
     # print(ads.adsorb_k(), ads.desorb_k())
     return ads.adsorb_k(), ads.desorb_k()
 
 
 def get_des_rate(kmc, i, T, P):
-    energylist_swap = [kmc.Energies[i][1], kmc.Energies[i][0]]
-    reactions_list_swap = [kmc.reactions[i][1], kmc.reactions[i][0]]
+    energylist_swap = [kmc.reactions[i][2][1], kmc.reactions[i][2][0]]
+    reactions_list_swap = [kmc.reactions[i][0][1], kmc.reactions[i][0][0]]
     # print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-    # print(energylist_swap, reactions_list_swap, T, P[kmc.reactions[i][1][-1].strip()], kmc.reactions[i][1][-1].strip())
-    ads = adsorption.Adsorption(energylist_swap, reactions_list_swap, T, P[kmc.reactions[i][1][-1].strip()], kmc.reactions[i][1][-1].strip())
+    # print(energylist_swap, reactions_list_swap, T, P[kmc.reactions[i][0][-1][-1].strip()], kmc.reactions[i][0][-1][-1].strip())
+    ads = adsorption.Adsorption(energylist_swap, reactions_list_swap, T, P[kmc.reactions[i][0][-1][-1].strip()], kmc.reactions[i][0][-1][-1].strip())
     return ads.desorb_k(), ads.adsorb_k()
 
