@@ -144,7 +144,7 @@ class Parameters(object):
                 for j in range(len(self.reactions[i][0])):
                     self.reactions[i][0][j] = list(map(lambda x: x.strip(), self.reactions[i][0][j].split('+')))
                 self.reactions[i][1] = self.reactions[i][1].strip()
-                self.reactions[i][2] = list(map(lambda x: x.strip(), self.reactions[i][2].split(",")))
+                self.reactions[i][2] = list(map(lambda x: float(x.strip()), self.reactions[i][2].split(",")))
 
 
             #    self.reactions[i] = list(map(lambda x: x.split(';'), self.reactions[i]))
