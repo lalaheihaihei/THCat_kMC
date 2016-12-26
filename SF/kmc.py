@@ -9,7 +9,8 @@
 from SF import adsorption
 from SF import reactions
 from SF import er
-# from SF import loop
+from SF import count_reaction
+from SF import loop
 from IO import Config
 
 
@@ -43,7 +44,6 @@ def add_reaction(kmc, T, P, rate_const = [], rate_const_dict = {}):
     return rate_const, rate_const_dict
 
 
-
 def initialize_lattice(kmc, count_cut_num_of_active = 0):
     """
     ATTENTION: this section should be define by users.
@@ -60,7 +60,7 @@ def initialize_lattice(kmc, count_cut_num_of_active = 0):
             lat.append([])
             for j in range(kmc.latticeSize[1]):
                 if i % 2 == 0:
-                    lat[i].append('15')
+                    lat[i].append('18')
                 elif i % 2 == 1:
                     lat[i].append('24')
         if kmc.periodic == "0":
@@ -81,8 +81,8 @@ def initialize_lattice(kmc, count_cut_num_of_active = 0):
             for i in range(kmc.latticeSize[0] + 2):
                 lat[i].insert(0,lat[i][-1])
                 lat[i].insert(kmc.latticeSize[1] + 1,lat[i][1])
+    lat[3][3] = "1"
     return lat
-
 
 def main():
     kmc = Config.Parameters()
@@ -100,6 +100,16 @@ def main():
     for i in lat:
         print(i)
 
+    # get num_of_avail_sites that should be like: [[0,2,3,6],[1,5],[4,7]...]
+    num_of_avail_sites = count_reaction.initialize_num_of_avail_sites(kmc, lat)
+    for i in range(len(kmc.reactions)):
+        print(str(i), '\t\t', num_of_avail_sites[str(i)])
+        print('-'+str(i), '\t\t', num_of_avail_sites['-'+str(i)])
 
+    # kmc_loop is an instance of class Loop in oneD_SAmodule.loop
+    kmc_loop = loop.Loop(kmc, rate_const_dict, lat, num_of_avail_sites)
+    # do loop
+    kmc_loop.do_kmc_loop()
+    print("###########################   normal termination   #####################################")
 if __name__ == "__main__":
     main()
