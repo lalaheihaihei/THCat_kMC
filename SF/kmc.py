@@ -93,7 +93,7 @@ def main():
 
     # output rate constants
     for i in range(len(kmc.reactions)):
-        print("For step %d: \t k(forward) = %.3e,\tk(backward) = %.3e," % (i+1, rate_const[i * 2], rate_const[i * 2 + 1]))
+        print("For step %d: \t k(forward) = %.3e,\tk(backward) = %.3e," % (i, rate_const[i * 2], rate_const[i * 2 + 1]))
 
     # initialize lattice species
     lat= initialize_lattice(kmc)
