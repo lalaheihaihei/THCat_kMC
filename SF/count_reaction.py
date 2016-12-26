@@ -111,75 +111,75 @@ def count_of_reverse_reactions(kmc, n_avail, lat, i, j, k):
     # for case: 7 -->
     if len(kmc.reactions[i][0][-1]) == 1 and kmc.reactions[i][0][-1][0].strip() in kmc.kinds:
         if lat[j][k] == kmc.reactions[i][0][-1][0].strip():
-            n_avail['-'+str(i)].append([str(i), [j, k]])
+            n_avail['-'+str(i)].append(['-'+str(i), [j, k]])
     # for case 7 + CO -->
     elif len(kmc.reactions[i][0][-1]) == 2 and kmc.reactions[i][0][-1][-1].strip() not in kmc.kinds:
         if lat[j][k] == kmc.reactions[i][0][-1][0].strip():
-            n_avail['-'+str(i)].append([str(i), [j, k]])
+            n_avail['-'+str(i)].append(['-'+str(i), [j, k]])
     # for case 7 + 8 -->
     elif len(kmc.reactions[i][0][-1]) == 2 and kmc.reactions[i][0][-1][-1].strip() in kmc.kinds:
         if lat[j][k] == kmc.reactions[i][0][-1][0].strip() and lat[j-1][k] == kmc.reactions[i][0][-1][1].strip():
-            n_avail['-'+str(i)].append([str(i), [j, k], [j-1, k]])
+            n_avail['-'+str(i)].append(['-'+str(i), [j, k], [j-1, k]])
         if lat[j][k] == kmc.reactions[i][0][-1][0].strip() and lat[j+1][k] == kmc.reactions[i][0][-1][1].strip():
-            n_avail['-'+str(i)].append([str(i), [j, k], [j+1, k]])
+            n_avail['-'+str(i)].append(['-'+str(i), [j, k], [j+1, k]])
         if lat[j][k] == kmc.reactions[i][0][-1][0].strip() and lat[j][k-1] == kmc.reactions[i][0][-1][1].strip():
-            n_avail['-'+str(i)].append([str(i), [j, k], [j, k-1]])
+            n_avail['-'+str(i)].append(['-'+str(i), [j, k], [j, k-1]])
         if lat[j][k] == kmc.reactions[i][0][-1][0].strip() and lat[j][k+1] == kmc.reactions[i][0][-1][1].strip():
-            n_avail['-'+str(i)].append([str(i), [j, k], [j, k+1]])
+            n_avail['-'+str(i)].append(['-'+str(i), [j, k], [j, k+1]])
     # for case 7 + 8 + CO -->
     elif len(kmc.reactions[i][0][-1]) == 3 and kmc.reactions[i][0][-1][-1].strip() not in kmc.kinds:
         if lat[j][k] == kmc.reactions[i][0][-1][0].strip() and lat[j-1][k] == kmc.reactions[i][0][-1][1].strip():
-            n_avail['-'+str(i)].append([str(i), [j, k], [j-1, k]])
+            n_avail['-'+str(i)].append(['-'+str(i), [j, k], [j-1, k]])
         if lat[j][k] == kmc.reactions[i][0][-1][0].strip() and lat[j+1][k] == kmc.reactions[i][0][-1][1].strip():
-            n_avail['-'+str(i)].append([str(i), [j, k], [j+1, k]])
+            n_avail['-'+str(i)].append(['-'+str(i), [j, k], [j+1, k]])
         if lat[j][k] == kmc.reactions[i][0][-1][0].strip() and lat[j][k-1] == kmc.reactions[i][0][-1][1].strip():
-            n_avail['-'+str(i)].append([str(i), [j, k], [j, k-1]])
+            n_avail['-'+str(i)].append(['-'+str(i), [j, k], [j, k-1]])
         if lat[j][k] == kmc.reactions[i][0][-1][0].strip() and lat[j][k+1] == kmc.reactions[i][0][-1][1].strip():
-            n_avail['-'+str(i)].append([str(i), [j, k], [j, k+1]])
+            n_avail['-'+str(i)].append(['-'+str(i), [j, k], [j, k+1]])
     # for case 7 + 8 + 9 -->
     elif len(kmc.reactions[i][0][-1]) == 3 and kmc.reactions[i][0][-1][-1].strip() in kmc.kinds:
         # for site j-1, j, j+1
         if lat[j][k] == kmc.reactions[i][0][-1][0].strip() and lat[j-1][k] == kmc.reactions[i][0][-1][1].strip() and \
                         lat[j+1][k] == kmc.reactions[i][0][-1][2].strip():
-            n_avail['-'+str(i)].append([str(i), [j, k], [j-1, k], [j+1, k]])
+            n_avail['-'+str(i)].append(['-'+str(i), [j, k], [j-1, k], [j+1, k]])
         if lat[j][k] == kmc.reactions[i][0][-1][0].strip() and lat[j+1][k] == kmc.reactions[i][0][-1][1].strip() and \
                         lat[j-1][k] == kmc.reactions[i][0][-1][2].strip():
-            n_avail['-'+str(i)].append([str(i), [j, k], [j+1, k], [j-1, k]])
+            n_avail['-'+str(i)].append(['-'+str(i), [j, k], [j+1, k], [j-1, k]])
         # for site k-1, k, k+1
         if lat[j][k] == kmc.reactions[i][0][-1][0].strip() and lat[j][k-1] == kmc.reactions[i][0][-1][1].strip() and \
                         lat[j][k+1] == kmc.reactions[i][0][-1][2].strip():
-            n_avail['-'+str(i)].append([str(i), [j, k], [j, k-1], [j, k+1]])
+            n_avail['-'+str(i)].append(['-'+str(i), [j, k], [j, k-1], [j, k+1]])
         if lat[j][k] == kmc.reactions[i][0][-1][0].strip() and lat[j][k+1] == kmc.reactions[i][0][-1][1].strip() and \
                         lat[j][k-1] == kmc.reactions[i][0][-1][2].strip():
-            n_avail['-'+str(i)].append([str(i), [j, k], [j, k+1], [j, k-1]])
+            n_avail['-'+str(i)].append(['-'+str(i), [j, k], [j, k+1], [j, k-1]])
         # for site j-1, jk, k-1
         if lat[j][k] == kmc.reactions[i][0][-1][0].strip() and lat[j-1][k] == kmc.reactions[i][0][-1][1].strip() and \
                         lat[j][k-1] == kmc.reactions[i][0][-1][2].strip():
-            n_avail['-'+str(i)].append([str(i), [j, k], [j-1, k], [j, k-1]])
+            n_avail['-'+str(i)].append(['-'+str(i), [j, k], [j-1, k], [j, k-1]])
         if lat[j][k] == kmc.reactions[i][0][-1][0].strip() and lat[j][k-1] == kmc.reactions[i][0][-1][1].strip() and \
                         lat[j-1][k] == kmc.reactions[i][0][-1][2].strip():
-            n_avail['-'+str(i)].append([str(i), [j, k], [j, k-1], [j-1, k]])
+            n_avail['-'+str(i)].append(['-'+str(i), [j, k], [j, k-1], [j-1, k]])
         # for site j+1, jk, k-1
         if lat[j][k] == kmc.reactions[i][0][-1][0].strip() and lat[j+1][k] == kmc.reactions[i][0][-1][1].strip() and \
                         lat[j][k-1] == kmc.reactions[i][0][-1][2].strip():
-            n_avail['-'+str(i)].append([str(i), [j, k], [j+1, k], [j, k-1]])
+            n_avail['-'+str(i)].append(['-'+str(i), [j, k], [j+1, k], [j, k-1]])
         if lat[j][k] == kmc.reactions[i][0][-1][0].strip() and lat[j][k-1] == kmc.reactions[i][0][-1][1].strip() and \
                         lat[j+1][k] == kmc.reactions[i][0][-1][2].strip():
-            n_avail['-'+str(i)].append([str(i), [j, k], [j, k-1], [j+1, k]])
+            n_avail['-'+str(i)].append(['-'+str(i), [j, k], [j, k-1], [j+1, k]])
         # for site j-1, jk, k+1
         if lat[j][k] == kmc.reactions[i][0][-1][0].strip() and lat[j-1][k] == kmc.reactions[i][0][-1][1].strip() and \
                         lat[j][k+1] == kmc.reactions[i][0][-1][2].strip():
-            n_avail['-'+str(i)].append([str(i), [j, k], [j-1, k], [j, k+1]])
+            n_avail['-'+str(i)].append(['-'+str(i), [j, k], [j-1, k], [j, k+1]])
         if lat[j][k] == kmc.reactions[i][0][-1][0].strip() and lat[j][k+1] == kmc.reactions[i][0][-1][1].strip() and \
                         lat[j-1][k] == kmc.reactions[i][0][-1][2].strip():
-            n_avail['-'+str(i)].append([str(i), [j, k], [j, k+1], [j-1, k]])
+            n_avail['-'+str(i)].append(['-'+str(i), [j, k], [j, k+1], [j-1, k]])
         # for site j+1, jk, k+1
         if lat[j][k] == kmc.reactions[i][0][-1][0].strip() and lat[j+1][k] == kmc.reactions[i][0][-1][1].strip() and \
                         lat[j][k+1] == kmc.reactions[i][0][-1][2].strip():
-            n_avail['-'+str(i)].append([str(i), [j, k], [j+1, k], [j, k+1]])
+            n_avail['-'+str(i)].append(['-'+str(i), [j, k], [j+1, k], [j, k+1]])
         if lat[j][k] == kmc.reactions[i][0][-1][0].strip() and lat[j][k+1] == kmc.reactions[i][0][-1][1].strip() and \
                         lat[j+1][k] == kmc.reactions[i][0][-1][2].strip():
-            n_avail['-'+str(i)].append([str(i), [j, k], [j, k+1], [j+1, k]])
+            n_avail['-'+str(i)].append(['-'+str(i), [j, k], [j, k+1], [j+1, k]])
     else:
         # print("no reaction")
         pass

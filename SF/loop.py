@@ -9,7 +9,8 @@ class controls the kmc loop. Need to transfer to fortran/C/C++/Cython further to
 
 import random
 import math
-from oneD_SAmodule import kmc
+from SF import kmc
+from SF import count_reaction
 
 class Loop(object):
 
@@ -119,15 +120,32 @@ class Loop(object):
         :param react_site: ["-6", 5, 6] means the reaction "-6" was selected and it processed on site 5 and 6.
         :return: None, but update self._lat
         """
-        react = [ i for i in react_site[0]]   # split react_site[0] : "-0" to ["-","0"]
-        if react[0] == "-":
-            self._lat[react_site[1]] = self._reactions[int(react[1])][0][0].strip()
-            if react_site[1] != react_site[2]:  # if the reaction involve two surface site
-                self._lat[react_site[2]] = self._reactions[int(react[1])][0][1].strip()
+        whether_reverse = [ i for i in react_site[0]]   # split react_site[0] : "-0" to ["-","0"]
+        if whether_reverse[0] == "-":
+            react = react_site[0][1:]
+            #print("RE@@@@@@@@@@@@@@@@", react_site, int(react), self._reactions[int(react)][0][-1][0].strip())
+            if len(react_site) == 2:  # if the reaction involve one surface site
+                self._lat[react_site[1][0]][react_site[1][1]] = self._reactions[int(react)][0][0][0].strip()
+            if len(react_site) == 3:  # if the reaction involve two surface site
+                self._lat[react_site[1][0]][react_site[1][1]] = self._reactions[int(react)][0][0][0].strip()
+                self._lat[react_site[2][0]][react_site[2][1]] = self._reactions[int(react)][0][0][1].strip()
+            if len(react_site) == 4:  # if the reaction involve three surface site
+                self._lat[react_site[1][0]][react_site[1][1]] = self._reactions[int(react)][0][0][0].strip()
+                self._lat[react_site[2][0]][react_site[2][1]] = self._reactions[int(react)][0][0][1].strip()
+                self._lat[react_site[3][0]][react_site[3][1]] = self._reactions[int(react)][0][0][2].strip()
         else:
-            self._lat[react_site[1]] = self._reactions[int(react[0])][-1][0].strip()
-            if react_site[1] != react_site[2]:  # if the reaction involve two surface site
-                self._lat[react_site[2]] = self._reactions[int(react[0])][-1][1].strip()
+            react = react_site[0]
+            #print("@@@@@@@@@@@@@@@@", react_site, int(react), self._reactions[int(react)][0][-1][0].strip())
+            if len(react_site) == 2:  # if the reaction involve one surface site
+                self._lat[react_site[1][0]][react_site[1][1]] = self._reactions[int(react)][0][-1][0].strip()
+            if len(react_site) == 3:  # if the reaction involve two surface site
+                self._lat[react_site[1][0]][react_site[1][1]] = self._reactions[int(react)][0][-1][0].strip()
+                self._lat[react_site[2][0]][react_site[2][1]] = self._reactions[int(react)][0][-1][1].strip()
+            if len(react_site) == 4:  # if the reaction involve three surface site
+                self._lat[react_site[1][0]][react_site[1][1]] = self._reactions[int(react)][0][-1][0].strip()
+                self._lat[react_site[2][0]][react_site[2][1]] = self._reactions[int(react)][0][-1][1].strip()
+                self._lat[react_site[3][0]][react_site[3][1]] = self._reactions[int(react)][0][-1][2].strip()
+        '''
         if self._kmc.periodic == "1":
             if 0 in react_site:
                 self._lat[-2] = self._lat[0]
@@ -138,6 +156,7 @@ class Loop(object):
             else:
                 self._lat[0] = self._lat[-2]
                 self._lat[-1] = self._lat[1]
+        '''
         return None
 
     def update_num_of_avail_sites(self):
@@ -146,7 +165,7 @@ class Loop(object):
         need to be optimized for large lattice, see: Computer Physics Communications 185 (2014) 2138.
         :return: None, but update self._num_of_avail_sites
         """
-        self._num_of_avail_sites = kmc.initialize_num_of_avail_sites(self._kmc, self._lat)
+        self._num_of_avail_sites = count_reaction.initialize_num_of_avail_sites(self._kmc, self._lat)
         return None
 
     def count_product(self, react_site):
@@ -159,10 +178,10 @@ class Loop(object):
         """
         if react_site[0] == self._kmc.count_product:
             self._product += 1
-            #print("+1")
+            print("+1")
         elif react_site[0] == "-"+self._kmc.count_product:
             self._product -= 1
-            #print("-1")
+            print("-1")
 
     def do_kmc_loop(self):
         print("\n\n&&&&&&&&&&&&&&&&&&&&&&&&&   prepare kMC loop   &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
@@ -173,9 +192,10 @@ class Loop(object):
         print("&&&&&&&&&&&&&&&&&&&&&&&&&      start loop      &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
 
         for i in range(self._loop_n):
+
             accum_rate = self.set_accum_rate()
             # print("accumulated rate is")
-            # for i in accum_rate:
+            #for i in accum_rate:
             #    print(i, "\t", accum_rate[i])
             d_t = self.update_time(accum_rate)
             # print(accum_rate)
@@ -183,18 +203,27 @@ class Loop(object):
             # print(self._time)
 
             react_k = self.do_random_k(accum_rate)
-
+            #print(react_k)
+            #print(self._num_of_avail_sites)
             react_site = self.do_random_site(react_k)
-            print("kMC step %s, reaction %s is processed on lattice site:." % (i, react_k), end='')
-            for i in react_site:
-                print(i)
-        '''
+            #print("kMC step %s, reaction %s is processed on lattice site:." % (i, react_k), end='')
+            #print(react_site)
+
             self.update_lat(react_site)
             # print(react_site, self._lat)
-            self.update_num_of_avail_sites()
             # print(self._num_of_avail_sites, "\n")
+            self.update_num_of_avail_sites()
+
+            if i%1000 == 0:
+                print("kMC step %s, reaction %s is processed on lattice site:." % (i, react_k), end='')
+                print(react_site)
+                for i in self._lat:
+                    print(i)
+
             self.count_product(react_site)
-        print("lattice:", self._lat)
+        for i in self._lat:
+            print(i)
+        '''
         print("number of SAs:", int(self._kmc.num_SA)-1)
         print("there are %d products in %.2f s" % (self._product, self._time[-1]))
         # self.kmc.num_SA-1 is the number of SAs because of periodic condition cutoff the first lattice site.
@@ -203,8 +232,8 @@ class Loop(object):
         # print("tof = ", math.log(self._product/ (self._time[-1] * (int(self._kmc.num_SA)-self._count_cut_num_of_active)) ))
 
         '''
-        self._coverage_list = list(map(lambda x: x/sum(self._coverage_list), self._coverage_list))
-        for i in range(len(self._coverage_list)):
-            print("coverage of surface species %s is %.3f:" % (self._kmc.kinds[i], self._coverage_list[i]))
+        #self._coverage_list = list(map(lambda x: x/sum(self._coverage_list), self._coverage_list))
+        #for i in range(len(self._coverage_list)):
+        #    print("coverage of surface species %s is %.3f:" % (self._kmc.kinds[i], self._coverage_list[i]))
 
         return None
