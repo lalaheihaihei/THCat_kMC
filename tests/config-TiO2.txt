@@ -5,7 +5,7 @@ Temperature = 300
 Gas = CO O2 CO2 H2O
 GasPressure = 1e-3, 2e-2, 1e-3, 1e-15
 latticeSize = 4, 4
-LoopNum = 1000000
+LoopNum = 100000
 
 [SF]
 surfaceKind = rutile-110
