@@ -81,7 +81,7 @@ def initialize_lattice(kmc, count_cut_num_of_active = 0):
             for i in range(kmc.latticeSize[0] + 2):
                 lat[i].insert(0,lat[i][-1])
                 lat[i].insert(kmc.latticeSize[1] + 1,lat[i][1])
-    lat[3][3] = "1"
+        lat[3][3] = "1"
     return lat
 
 def main():
@@ -96,15 +96,15 @@ def main():
         print("For step %d: \t k(forward) = %.3e,\tk(backward) = %.3e," % (i, rate_const[i * 2], rate_const[i * 2 + 1]))
 
     # initialize lattice species
-    lat= initialize_lattice(kmc)
+    lat = initialize_lattice(kmc)
     for i in lat:
         print(i)
 
-    # get num_of_avail_sites that should be like: [[0,2,3,6],[1,5],[4,7]...]
+    # get num_of_avail_sites that should be like: {'2': [['2', [3, 3], [3, 4]], ...], ...}
     num_of_avail_sites = count_reaction.initialize_num_of_avail_sites(kmc, lat)
-    for i in range(len(kmc.reactions)):
-        print(str(i), '\t\t', num_of_avail_sites[str(i)])
-        print('-'+str(i), '\t\t', num_of_avail_sites['-'+str(i)])
+    # for i in range(len(kmc.reactions)):
+    #     print(str(i), '\t\t', num_of_avail_sites[str(i)])
+    #     print('-'+str(i), '\t\t', num_of_avail_sites['-'+str(i)])
 
     # kmc_loop is an instance of class Loop in oneD_SAmodule.loop
     kmc_loop = loop.Loop(kmc, rate_const_dict, lat, num_of_avail_sites)

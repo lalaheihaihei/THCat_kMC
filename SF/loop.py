@@ -176,54 +176,65 @@ class Loop(object):
         :param react_site: ["-6", 5, 6] means the reaction "-6" was selected and it processed on site 5 and 6.
         :return: None, count product number.
         """
-        if react_site[0] == self._kmc.count_product:
-            self._product += 1
-            print("+1")
-        elif react_site[0] == "-"+self._kmc.count_product:
-            self._product -= 1
-            print("-1")
+        for i in self._kmc.count_product:
+            if react_site[0] == i:
+                self._product += 1
+                #print("+1")
+            elif react_site[0] == "-"+i:
+                self._product -= 1
+                #print("-1")
 
     def do_kmc_loop(self):
-        print("\n\n&&&&&&&&&&&&&&&&&&&&&&&&&   prepare kMC loop   &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-        print("rate_const_dict :", self._rate_const_dict)
-        # print("The lattice :", self._lat)
+        print("\n&&&&&&&&&&&&&&&&&&&&&&&&&   prepare kMC loop   &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&\n")
+        #print("rate_const_dict :", self._rate_const_dict)
+        #print("The lattice :", self._lat)
+        for (k, v) in self._num_of_avail_sites.items():
+            if v != []:
+                print("reaction %s:" % k, v)
         # print("number of the available sites for specific elementary reaction is: \n", self._num_of_avail_sites)
         print("loop number is", self._loop_n)
-        print("&&&&&&&&&&&&&&&&&&&&&&&&&      start loop      &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+        print("\n&&&&&&&&&&&&&&&&&&&&&&&&&      start loop      &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&\n")
 
         for i in range(self._loop_n):
 
+            # update accumulate rate for every elementary reaction step.
             accum_rate = self.set_accum_rate()
 
+            # update time
             d_t = self.update_time(accum_rate)
-            # print(accum_rate)
+
+            # store coverage infomation
             self.update_coverage(d_t)
-            # print(self._time)
 
+            # select the reaction
             react_k = self.do_random_k(accum_rate)
-            #print(react_k)
-            #print(self._num_of_avail_sites)
-            react_site = self.do_random_site(react_k)
-            #print("kMC step %s, reaction %s is processed on lattice site:." % (i, react_k), end='')
-            #print(react_site)
 
+            # select the lattice site
+            react_site = self.do_random_site(react_k)
+
+            # update surface species
             self.update_lat(react_site)
-            # print(react_site, self._lat)
-            # print(self._num_of_avail_sites, "\n")
+
+            # update available reactions dictionary
             self.update_num_of_avail_sites()
 
+            # count product number
+            self.count_product(react_site)
+
+            # print for every 1000 steps
             if i%1000 == 0:
-                print("accumulated rate is")
-                for i in accum_rate:
-                   print(i, "\t", accum_rate[i])
-                print("kMC step %s, reaction %s is processed on lattice site:." % (i, react_k), end='')
-                print(react_site)
+                print("\n################  loop %d  ####################\n" % i)
+                for (k, v) in accum_rate.items():
+                    if v != 0:
+                        print("accumulated rate %3s : %.3e" % (k, v))
+                print("total time for loop 0 -%8d is %.3e:" % (i, self._time[-1]))
+                print("kMC step %s, reaction %s happens on lattice site:" % (i, react_k), react_site)
+                print("lattice model:")
                 for i in self._lat:
                     print(i)
+                print("product number is %d", self._product)
 
-            self.count_product(react_site)
-        for i in self._lat:
-            print(i)
+
         '''
         print("number of SAs:", int(self._kmc.num_SA)-1)
         print("there are %d products in %.2f s" % (self._product, self._time[-1]))

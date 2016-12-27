@@ -1,11 +1,11 @@
 [common]
 Title = TiO2
 RunType = SF
-Temperature = 200
+Temperature = 300
 Gas = CO O2 CO2 H2O
-GasPressure = 1e-3, 2e-1, 1e-3, 1e-5
+GasPressure = 1e-3, 2e-1, 1e-3, 1e-15
 latticeSize = 4, 4
-LoopNum = 1
+LoopNum = 10000
 
 [SF]
 surfaceKind = rutile-110
@@ -138,6 +138,6 @@ Freq =  1,
         1,
         1,
         1
-countProduct = 19
+countProduct = 6, 8, 20
 notCountCover = 0
 periodic = 1
