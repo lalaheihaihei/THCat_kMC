@@ -194,9 +194,7 @@ class Loop(object):
         for i in range(self._loop_n):
 
             accum_rate = self.set_accum_rate()
-            # print("accumulated rate is")
-            #for i in accum_rate:
-            #    print(i, "\t", accum_rate[i])
+
             d_t = self.update_time(accum_rate)
             # print(accum_rate)
             self.update_coverage(d_t)
@@ -215,6 +213,9 @@ class Loop(object):
             self.update_num_of_avail_sites()
 
             if i%1000 == 0:
+                print("accumulated rate is")
+                for i in accum_rate:
+                   print(i, "\t", accum_rate[i])
                 print("kMC step %s, reaction %s is processed on lattice site:." % (i, react_k), end='')
                 print(react_site)
                 for i in self._lat:

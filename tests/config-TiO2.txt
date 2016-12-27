@@ -1,11 +1,11 @@
 [common]
 Title = TiO2
 RunType = SF
-Temperature = 300
+Temperature = 200
 Gas = CO O2 CO2 H2O
-GasPressure = 1e-3, 2e-2, 1e-3, 1e-15
+GasPressure = 1e-3, 2e-1, 1e-3, 1e-5
 latticeSize = 4, 4
-LoopNum = 100000
+LoopNum = 1
 
 [SF]
 surfaceKind = rutile-110
@@ -30,7 +30,7 @@ reactions = 1 + CO <--> 2;                          ads;    0.0, -2.07
             21 + 15 + 25 <-->ts7<--> 22 + 16 + 24;  react;  0.0, 0.21, -0.21
             16 + 22 <--> ts <--> 13 + 20;           react;  0.0, 0.92, 0.52
             13 + CO <--> ts <--> 14;                er;     0.0, 0.18, -3.71
-            16 + 22 + CO <--> ts <--> 14 + 20;      er;     0.0, 0.27, -3.51
+            16 + 22 + CO <--> ts <--> 14 + 20;      er;     0.0, 0.07, -3.51
             14 <--> 1 + CO2;                        des;    0.0, 0.37
             18 + H2O <--> 19;                       ads;    0.0, -1.23
             19 + 24 <--> ts <--> 20 + 25;           react;  0.0, 0.7, 0.0
@@ -138,6 +138,6 @@ Freq =  1,
         1,
         1,
         1
-countProduct = 11
+countProduct = 19
 notCountCover = 0
 periodic = 1
