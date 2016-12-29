@@ -161,7 +161,7 @@ class Parameters(object):
             # print("All elementary steps' freq is ,", self.Freq)
 
 
-            self.count_product = tuple(map(lambda x: str(x.strip()), SF['countProduct'].strip(",")))
+            self.count_product = tuple(map(lambda x: str(x.strip()), SF['countProduct'].split(",")))
 
             self.not_count_cover = tuple(map(lambda x: str(x.strip()), SF['notCountCover'].split(',')))
 

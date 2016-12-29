@@ -109,7 +109,7 @@ def main():
     # kmc_loop is an instance of class Loop in oneD_SAmodule.loop
     kmc_loop = loop.Loop(kmc, rate_const_dict, lat, num_of_avail_sites)
     # do loop
-    kmc_loop.do_kmc_loop()
+    kmc_loop.do_kmc_loop
     print("###########################   normal termination   #####################################")
 if __name__ == "__main__":
     main()
