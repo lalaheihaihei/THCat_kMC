@@ -14,7 +14,7 @@ from SF import count_reaction
 
 class Loop(object):
 
-    def __init__(self, kmc, rate_const_dict, lat, num_of_avail_sites, time = [0], product = 0):
+    def __init__(self, kmc, rate_const_dict, lat, num_of_avail_sites, time = [0]):
         """
         :param kmc: input parameters instance
         :param rate_const_dict: all reaction rate constants
@@ -30,7 +30,6 @@ class Loop(object):
         self._loop_n = kmc.LoopNum
         self._reactions = kmc.reactions
         self._time = time
-        self._product = product
         self._coverage_list = list(map(lambda x: 0, self._kmc.kinds)) # initialize the coverage list
 
     def set_accum_rate(self):
@@ -104,26 +103,9 @@ class Loop(object):
         return None
 
     def update_lat(self, react_site):
-        """
-         self._reactions like : [[['1 ', ' CO'], ['2']], [['2 ', ' 0'], ['ts1'], ['3 ', ' 4']]
-         self._reactions[int(react[1])]: select the reaction;
-         self._reactions[int(react[1])][-1]: select the kinds involved in reverse reaction;
-         self._reactions[int(react[1])][-1][0]: select the first kinds involved in reverse reaction;
-         self._reactions[int(react[1])][-1][1]: select the second kinds involved in reverse reaction;
-         self._reactions[int(react[1])][0][0]:  select the first kinds to be;
-         self._reactions[int(react[1])][0][1]:  select the second kinds to be
-
-         if the first and last element in lat is involved in reactions.(for periodic calculation.)
-         the corresponding site should be update with the lat[0] or lat[-1]
-         else: the lat[0] or lat[-1] should be update with the corresponding sites in real lat.
-
-        :param react_site: ["-6", 5, 6] means the reaction "-6" was selected and it processed on site 5 and 6.
-        :return: None, but update self._lat
-        """
         whether_reverse = [ i for i in react_site[0]]   # split react_site[0] : "-0" to ["-","0"]
         if whether_reverse[0] == "-":
             react = react_site[0][1:]
-            #print("RE@@@@@@@@@@@@@@@@", react_site, int(react), self._reactions[int(react)][0][-1][0].strip())
             if len(react_site) == 2:  # if the reaction involve one surface site
                 self._lat[react_site[1][0]][react_site[1][1]] = self._reactions[int(react)][0][0][0].strip()
             if len(react_site) == 3:  # if the reaction involve two surface site
@@ -135,7 +117,6 @@ class Loop(object):
                 self._lat[react_site[3][0]][react_site[3][1]] = self._reactions[int(react)][0][0][2].strip()
         else:
             react = react_site[0]
-            #print("@@@@@@@@@@@@@@@@", react_site, int(react), self._reactions[int(react)][0][-1][0].strip())
             if len(react_site) == 2:  # if the reaction involve one surface site
                 self._lat[react_site[1][0]][react_site[1][1]] = self._reactions[int(react)][0][-1][0].strip()
             if len(react_site) == 3:  # if the reaction involve two surface site
@@ -145,18 +126,37 @@ class Loop(object):
                 self._lat[react_site[1][0]][react_site[1][1]] = self._reactions[int(react)][0][-1][0].strip()
                 self._lat[react_site[2][0]][react_site[2][1]] = self._reactions[int(react)][0][-1][1].strip()
                 self._lat[react_site[3][0]][react_site[3][1]] = self._reactions[int(react)][0][-1][2].strip()
-        '''
+        # periodic condition
         if self._kmc.periodic == "1":
-            if 0 in react_site:
-                self._lat[-2] = self._lat[0]
-                self._lat[-1] = self._lat[1]
-            elif len(self._lat)-1 in react_site:
-                self._lat[0] = self._lat[-2]
-                self._lat[1] = self._lat[-1]
-            else:
-                self._lat[0] = self._lat[-2]
-                self._lat[-1] = self._lat[1]
-        '''
+            for i in range(len(self._lat[0])):
+                if [0, i] in react_site:
+                    print('a')
+                    self._lat[-2] = self._lat[0]
+                    self._lat[-1] = self._lat[1]
+                    break
+                elif [len(self._lat)-1, i] in react_site:
+                    print('b')
+                    self._lat[0] = self._lat[-2]
+                    self._lat[1] = self._lat[-1]
+                    break
+            print('c')
+            self._lat[0] = self._lat[-2]
+            self._lat[-1] = self._lat[1]
+            for i in range(len(self._lat)):
+                if [i, 0] in react_site:
+                    print('d')
+                    self._lat[i][-2] = self._lat[i][0]
+                    self._lat[i][-1] = self._lat[i][1]
+
+                elif [i, len(self._lat[0])-1] in react_site:
+                    print('e')
+                    self._lat[i][0] = self._lat[i][-2]
+                    self._lat[i][1] = self._lat[i][-1]
+
+                print('f')
+                self._lat[i][0] = self._lat[i][-2]
+                self._lat[i][-1] = self._lat[i][1]
+
         return None
 
     def update_num_of_avail_sites(self):
@@ -168,61 +168,107 @@ class Loop(object):
         self._num_of_avail_sites = count_reaction.initialize_num_of_avail_sites(self._kmc, self._lat)
         return None
 
-    def count_product(self, react_site):
+    def count_product(self, react_site, products):
         """
-        This def counts product number. if the selected reaction is same as input files count key (kmc.count_product)
+        This def counts product number. if the selected reaction is in input files count key (kmc.count_product)
         count +1, on the contrary, if the reverse reaction is done. count -1
 
         :param react_site: ["-6", 5, 6] means the reaction "-6" was selected and it processed on site 5 and 6.
         :return: None, count product number.
         """
-        if react_site[0] == self._kmc.count_product:
-            self._product += 1
-            print("+1")
-        elif react_site[0] == "-"+self._kmc.count_product:
-            self._product -= 1
-            print("-1")
+        for i in range(len(products)):
+            if react_site[0] == self._kmc.count_product[i]:
+                products[i] += 1
+                #print("+1")
+            elif react_site[0] == "-" + self._kmc.count_product[i]:
+                products[i] -= 1
+                #print("-1")
+        return products
 
+    @property
     def do_kmc_loop(self):
-        print("\n\n&&&&&&&&&&&&&&&&&&&&&&&&&   prepare kMC loop   &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-        print("rate_const_dict :", self._rate_const_dict)
-        # print("The lattice :", self._lat)
-        # print("number of the available sites for specific elementary reaction is: \n", self._num_of_avail_sites)
+
+        print("\n&&&&&&&&&&&&&&&&&&&&&&&&&   prepare kMC loop   &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&\n")
+        for (k, v) in self._num_of_avail_sites.items():
+            if v != []:
+                print("reaction %s:" % k, v)
         print("loop number is", self._loop_n)
-        print("&&&&&&&&&&&&&&&&&&&&&&&&&      start loop      &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+        print("count products is", self._kmc.count_product)
+        reactions = {}   # reactions contains all processed reactions in this 1000 steps
+        products = [i*0 for i in range(len(self._kmc.count_product))]
+        h_num = 0  # debug
+        print("\n&&&&&&&&&&&&&&&&&&&&&&&&&      start loop      &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&\n")
 
         for i in range(self._loop_n):
 
+            # little trick: if the pt is occupied by H2O,
+            # the self._num_of_avail_sites will be {['-1': [['-1', [3,3]] ] ]}
+            if self._lat[3][3] == '3':
+                for (k, v) in self._num_of_avail_sites.items():
+                    v = []
+                print("======================================================="
+                      "warning: H2O was force desorbed"
+                      "=======================================================")
+                self._num_of_avail_sites['-1'].append(['-1', [3, 3]])
+
+
+            # update accumulate rate for every elementary reaction step.
             accum_rate = self.set_accum_rate()
-            # print("accumulated rate is")
-            #for i in accum_rate:
-            #    print(i, "\t", accum_rate[i])
+
+            # print for every 1000 steps
+            if i % 1 == 0:
+                print("\n###################  loop %d  ####################\n" % i)
+                reactions = {}  # reactions contains all processed reactions in this 1000 steps
+                for j in range(len(self._kmc.reactions)):  # loop all reactions
+                    reactions[str(j)] = 0        # set 0 for every forward reactions
+                    reactions['-' + str(j)] = 0  # set 0 for every reverse reactions
+                for (k, v) in accum_rate.items():
+                    if v != 0:
+                        print("accumulated rate %3s : %.3e" % (k, v), len(self._num_of_avail_sites[k]))
+
+            # update time
             d_t = self.update_time(accum_rate)
-            # print(accum_rate)
+
+            # store coverage infomation
             self.update_coverage(d_t)
-            # print(self._time)
 
+            # select the reaction
             react_k = self.do_random_k(accum_rate)
-            #print(react_k)
-            #print(self._num_of_avail_sites)
-            react_site = self.do_random_site(react_k)
-            #print("kMC step %s, reaction %s is processed on lattice site:." % (i, react_k), end='')
-            #print(react_site)
+            reactions[react_k] += 1
 
+            # select the lattice site
+            react_site = self.do_random_site(react_k)
+
+            # update surface species
             self.update_lat(react_site)
-            # print(react_site, self._lat)
-            # print(self._num_of_avail_sites, "\n")
+
+            # update available reactions dictionary
             self.update_num_of_avail_sites()
 
-            if i%1000 == 0:
-                print("kMC step %s, reaction %s is processed on lattice site:." % (i, react_k), end='')
-                print(react_site)
-                for i in self._lat:
-                    print(i)
+            # count product number
+            products = self.count_product(react_site, products)
 
-            self.count_product(react_site)
-        for i in self._lat:
-            print(i)
+            # print for every 1000 steps
+            if i % 1 == 0:
+                print("total time for loop 0 -%8d is %.3e:" % (i, self._time[-1]))
+                print("kMC step %s, reaction %s happens on lattice site:" % (i, react_k), react_site)
+                print("lattice model:")
+                for j in self._lat:
+                    print(j)
+                print("product number is:", products)
+            h_num = 0
+            if i % 1 == 0:
+                for j in self._lat[1:-1]:
+                    for k in j[1:-1]:
+                        if k == '20':
+                            h_num -= 1
+                        elif k == '25' or k == '6':
+                            h_num += 1
+                        elif k == '26':
+                            h_num += 2
+            print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@", h_num)
+
+
         '''
         print("number of SAs:", int(self._kmc.num_SA)-1)
         print("there are %d products in %.2f s" % (self._product, self._time[-1]))

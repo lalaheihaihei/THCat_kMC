@@ -109,7 +109,7 @@ class Adsorption(object):
 
 def get_ads_rate(kmc, i, T, P):
     # print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ads')
-    print(kmc.reactions[i][2], kmc.reactions[i][0], T, P[kmc.reactions[i][0][0][-1].strip()], kmc.reactions[i][0][0][-1].strip())
+    # print(kmc.reactions[i][2], kmc.reactions[i][0], T, P[kmc.reactions[i][0][0][-1].strip()], kmc.reactions[i][0][0][-1].strip())
     ads = adsorption.Adsorption(kmc.reactions[i][2], kmc.reactions[i][0], T, P[kmc.reactions[i][0][0][-1].strip()], kmc.reactions[i][0][0][-1].strip())
     # print(ads.adsorb_k(), ads.desorb_k())
     return ads.adsorb_k(), ads.desorb_k()
