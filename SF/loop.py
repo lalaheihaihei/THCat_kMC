@@ -130,33 +130,26 @@ class Loop(object):
         if self._kmc.periodic == "1":
             for i in range(len(self._lat[0])):
                 if [0, i] in react_site:
-                    print('a')
                     self._lat[-2] = self._lat[0]
                     self._lat[-1] = self._lat[1]
                     break
                 elif [len(self._lat)-1, i] in react_site:
-                    print('b')
                     self._lat[0] = self._lat[-2]
                     self._lat[1] = self._lat[-1]
                     break
-            print('c')
             self._lat[0] = self._lat[-2]
             self._lat[-1] = self._lat[1]
             for i in range(len(self._lat)):
                 if [i, 0] in react_site:
-                    print('d')
                     self._lat[i][-2] = self._lat[i][0]
                     self._lat[i][-1] = self._lat[i][1]
 
                 elif [i, len(self._lat[0])-1] in react_site:
-                    print('e')
                     self._lat[i][0] = self._lat[i][-2]
                     self._lat[i][1] = self._lat[i][-1]
-
-                print('f')
+            for i in range(len(self._lat)):
                 self._lat[i][0] = self._lat[i][-2]
                 self._lat[i][-1] = self._lat[i][1]
-
         return None
 
     def update_num_of_avail_sites(self):
@@ -196,7 +189,6 @@ class Loop(object):
         print("count products is", self._kmc.count_product)
         reactions = {}   # reactions contains all processed reactions in this 1000 steps
         products = [i*0 for i in range(len(self._kmc.count_product))]
-        h_num = 0  # debug
         print("\n&&&&&&&&&&&&&&&&&&&&&&&&&      start loop      &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&\n")
 
         for i in range(self._loop_n):
@@ -216,7 +208,7 @@ class Loop(object):
             accum_rate = self.set_accum_rate()
 
             # print for every 1000 steps
-            if i % 1 == 0:
+            if i % 1000 == 0:
                 print("\n###################  loop %d  ####################\n" % i)
                 reactions = {}  # reactions contains all processed reactions in this 1000 steps
                 for j in range(len(self._kmc.reactions)):  # loop all reactions
@@ -249,24 +241,14 @@ class Loop(object):
             products = self.count_product(react_site, products)
 
             # print for every 1000 steps
-            if i % 1 == 0:
+            if i % 1000 == 0:
                 print("total time for loop 0 -%8d is %.3e:" % (i, self._time[-1]))
                 print("kMC step %s, reaction %s happens on lattice site:" % (i, react_k), react_site)
                 print("lattice model:")
                 for j in self._lat:
                     print(j)
                 print("product number is:", products)
-            h_num = 0
-            if i % 1 == 0:
-                for j in self._lat[1:-1]:
-                    for k in j[1:-1]:
-                        if k == '20':
-                            h_num -= 1
-                        elif k == '25' or k == '6':
-                            h_num += 1
-                        elif k == '26':
-                            h_num += 2
-            print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@", h_num)
+
 
 
         '''
