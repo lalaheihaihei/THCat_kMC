@@ -148,22 +148,21 @@ class Parameters(object):
                 self.reactions[i][1] = self.reactions[i][1].strip()
                 self.reactions[i][2] = list(map(lambda x: float(x.strip()), self.reactions[i][2].split(",")))
 
-
             #    self.reactions[i] = list(map(lambda x: x.split(';'), self.reactions[i]))
             # print("All elementary steps contain:", self.reactions)
-
-
-
 
             self.Freq = list(map(lambda x: x.strip().split(' '), SF['Freq'].split(',')))
             for i in range(len(self.Freq)):
                 self.Freq[i] = list(map(lambda x: float(x), self.Freq[i]))
             # print("All elementary steps' freq is ,", self.Freq)
 
-
             self.count_product = tuple(map(lambda x: str(x.strip()), SF['countProduct'].split(",")))
 
-            self.not_count_cover = tuple(map(lambda x: str(x.strip()), SF['notCountCover'].split(',')))
+            self.count_cover = list(map(lambda x: x.strip(), SF['CountCover'].split(',')))
+            for i in range(len(self.count_cover)):
+                self.count_cover[i] = self.count_cover[i].split('-')
+                self.count_cover[i] = [int(j) for j in range(int(self.count_cover[i][0]), int(self.count_cover[i][-1])+1)]
+
 
             self.periodic = SF['periodic'].strip()
 

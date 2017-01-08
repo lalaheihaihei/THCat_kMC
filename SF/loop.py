@@ -97,9 +97,8 @@ class Loop(object):
         :return: None, but update self._coverage_list
         """
         for i in range(len(self._kmc.kinds)):
-            if self._kmc.kinds[i] not in self._kmc.not_count_cover:
-                for j in self._lat:
-                    self._coverage_list[i] += d_t * j.count(self._kmc.kinds[i])
+            for j in self._lat[1:-1]:
+                self._coverage_list[i] += d_t * j[1:-1].count(self._kmc.kinds[i])
         return None
 
     def update_lat(self, react_site):
@@ -189,6 +188,7 @@ class Loop(object):
         print("count products is", self._kmc.count_product)
         reactions = {}   # reactions contains all processed reactions in this 1000 steps
         products = [i*0 for i in range(len(self._kmc.count_product))]
+        print("coverage initialize:", self._kmc.count_cover)
         print("\n&&&&&&&&&&&&&&&&&&&&&&&&&      start loop      &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&\n")
 
         for i in range(self._loop_n):
@@ -196,10 +196,10 @@ class Loop(object):
             # little trick: if the pt is occupied by H2O,
             # the self._num_of_avail_sites will be {['-1': [['-1', [3,3]] ] ]}
             if self._lat[3][3] == '3':
-                for (k, v) in self._num_of_avail_sites.items():
-                    v = []
-                print("======================================================="
-                      "warning: H2O was force desorbed"
+                for k in self._num_of_avail_sites.keys():
+                    self._num_of_avail_sites[k] = []
+                print("=======================================================\n"
+                      "warning: H2O was force desorbed\n"
                       "=======================================================")
                 self._num_of_avail_sites['-1'].append(['-1', [3, 3]])
 
@@ -249,19 +249,22 @@ class Loop(object):
                     print(j)
                 print("product number is:", products)
 
+        print("###########################   Summary   #####################################")
+        print("there are %d products in %.2f s" % (sum(products), self._time[-1]))
+        print("the real active sites number is  %d" % 1)
+        print("ln(tof/s-1)  = ", math.log( sum(products) / self._time[-1] ))
 
-
-        '''
-        print("number of SAs:", int(self._kmc.num_SA)-1)
-        print("there are %d products in %.2f s" % (self._product, self._time[-1]))
-        # self.kmc.num_SA-1 is the number of SAs because of periodic condition cutoff the first lattice site.
-        # print("the real active sites number is %d - %d = %d" % \
-        #      (int(self._kmc.num_SA), self._count_cut_num_of_active, int(self._kmc.num_SA) - self._count_cut_num_of_active))
-        # print("tof = ", math.log(self._product/ (self._time[-1] * (int(self._kmc.num_SA)-self._count_cut_num_of_active)) ))
-
-        '''
-        #self._coverage_list = list(map(lambda x: x/sum(self._coverage_list), self._coverage_list))
-        #for i in range(len(self._coverage_list)):
-        #    print("coverage of surface species %s is %.3f:" % (self._kmc.kinds[i], self._coverage_list[i]))
+        coverage = []
+        for i in range(len(self._kmc.count_cover)):
+            coverage.append([])
+            coverage_sum = 0
+            for j in self._kmc.count_cover[i]:
+                coverage_sum += (self._coverage_list[j-1])
+            for j in self._kmc.count_cover[i]:
+                coverage[i].append(self._coverage_list[j-1]/coverage_sum)
+        for i in range(len(self._kmc.count_cover)):
+            for j in range(len(self._kmc.count_cover[i])):
+                print("Coverage of species {:d} is {:.2f}%".format(self._kmc.count_cover[i][j], coverage[i][j] * 100))
+            print("sum:", sum(coverage[i]))
 
         return None
